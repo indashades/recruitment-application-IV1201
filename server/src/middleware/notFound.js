@@ -1,5 +1,8 @@
 function notFound(req, res, next) {
-  res.status(404).json({ error: { message: "Not Found" } });
+  const { NotFoundError } = require("../errors");
+  next(
+    new NotFoundError("Not Found", { path: req.originalUrl })
+  );
 }
 
 module.exports = { notFound };
