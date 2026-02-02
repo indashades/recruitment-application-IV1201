@@ -1,19 +1,12 @@
-const { AppError } = require("../errors");
+const { normalizeError } = require("../errors/normalizeError");
 
 function errorHandler(err, req, res, next) {
   const requestId = req.requestId;
-
-  let status = 500;
-  let code = "INTERNAL_ERROR";
-  let message = "Internal Server Error";
-  let details;
-
-  if (err instanceof AppError) {
-    status = err.status;
-    code = err.code;
-    message = err.expose ? err.message : message;
-    details = err.details;
-  }
+  const e = normalizeError(err);
+  const status = e.status || 500;
+  const code = e.code || "INTERNAL_ERROR";
+  const message = e.expose ? e.message : "Internal Server Error";
+  const details = e.details;
 
   const logPayload = {
     requestId,
@@ -23,7 +16,8 @@ function errorHandler(err, req, res, next) {
     code,
     message: err && err.message,
     stack: err && err.stack,
-    details: details,
+    details,
+
   };
   
   console.error(logPayload);
@@ -35,7 +29,7 @@ function errorHandler(err, req, res, next) {
     },
   };
   if (requestId) body.error.requestId = requestId;
-  if (details && status < 500) body.error.details = details;
+    if (details && status < 500) body.error.details = details;
 
   res.status(status).json(body);
 }

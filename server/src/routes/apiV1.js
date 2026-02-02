@@ -2,15 +2,16 @@ const express = require("express");
 const router = express.Router();
 const { asyncHandler } = require("../utils/asyncHandler");
 
+const authRoutes = require("./auth");
+const applicationsRoutes = require("./applications");
+const competencesRoutes = require("./competences");
 
 const { healthController } = require("../controllers/healthController");
-const {
-  createApplication,
-  getApplications,
-} = require("../controllers/applicationController");
 
-router.get("/health", healthController);
-router.post("/applications", asyncHandler(createApplication));
-router.get("/applications", asyncHandler(getApplications));
+router.get("/health", asyncHandler(healthController));
+
+router.use("/auth", authRoutes);
+router.use("/applications", applicationsRoutes);
+router.use("/competences", competencesRoutes);
 
 module.exports = router;

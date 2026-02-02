@@ -12,9 +12,9 @@ class AppError extends Error {
 }
 
 class ValidationError extends AppError {
-  constructor(message = "Validation failed", details) {
+  constructor(message = "Validation failed", details, opts = {}) {
     super(message, {
-      status: 400,
+      status: opts.status || 422,
       code: "VALIDATION_ERROR",
       expose: true,
       details,
@@ -23,8 +23,13 @@ class ValidationError extends AppError {
 }
 
 class AuthError extends AppError {
-  constructor(message = "Authentication required") {
-    super(message, { status: 401, code: "AUTH_REQUIRED", expose: true });
+  constructor(message = "Authentication required", opts = {}) {
+    super(message, {
+      status: 401,
+      code: opts.code || "AUTH_REQUIRED",
+      expose: true,
+      details: opts.details,
+    });
   }
 }
 
