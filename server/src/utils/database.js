@@ -32,8 +32,28 @@ async function getClient() {
   return client;
 }
 
+async function withTransaction(fn) {
+  const client = await getClient();
+  try {
+    await client.query("BEGIN");
+    const result = await fn(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    try {
+      await client.query("ROLLBACK");
+    } catch (rollbackErr) {
+      console.error("Transaction rollback failed", { rollbackErr });
+    }
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   query,
   getClient,
+  withTransaction,
   pool,
 };
