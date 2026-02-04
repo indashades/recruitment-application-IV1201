@@ -18,7 +18,7 @@ const submitSchema = Joi.object({
     .items(
       Joi.object({
         competenceId: Joi.number().integer().positive().required(),
-        yearsOfExperience: Joi.number().integer().min(0).max(80).required(),
+        yearsOfExperience: Joi.number().min(0).max(80).precision(2).required(),
       }).required()
     )
     .min(1)
