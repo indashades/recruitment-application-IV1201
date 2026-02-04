@@ -2,6 +2,7 @@
 
 const model = {  
     
+    //variables
     person_id: null,
     name: null,
     surname: null,
@@ -12,7 +13,9 @@ const model = {
     username: null,
     loggedin: 0,
     wantedPage: "",
+    //will add an applications here soon
 
+    //functions
     registrering(pnr1,name1,name2,mail,pw1,username1)
     {
         this.pnr=pnr1;
