@@ -11,8 +11,19 @@ const Start = observer(
                 
                 window.location.hash = "#/RegOrLog";
           }
-          function viewApplicants(){/*nothing yet*/}//should go to regorlog if not logged in then to wanted page
-          function apply(){/*nothing yet*/}
+          function viewApplicants(){if(model.model.recruiter==0)
+            {
+                model.model.setWantedPage("#/viewAppl");
+                window.location.hash = "#/RegOrLog";
+            }
+            else{window.location.hash = "#/viewAppl";}
+        }
+          function apply(){if(model.model.loggedin==0)
+            {
+                model.model.setWantedPage("#/Appl");
+                window.location.hash = "#/RegOrLog";
+            }
+            else{window.location.hash = "#/Appl";}}
           
         
         

@@ -36,6 +36,7 @@ const Register = observer(
                 if (model.model.loggedin==1)
                 {
                     alert("log in successful");
+                    window.location.hash = model.model.wantedPage;
                 }
                 //window.location.hash = "#/RegOrLog";
                 //denna bestämmer

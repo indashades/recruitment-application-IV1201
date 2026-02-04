@@ -12,10 +12,13 @@ const model = {
     role_id: null,
     username: null,
     loggedin: 0,
-    wantedPage: "",
-    //will add an applications here soon
+    recruiter: 0,
+    wantedPage: "#/",
+    //will add an applications list here soon for the recruiter to view but am waiting to see if we want to put the 2 together first
+    //i have a way to view these done but not yet commited
 
     //functions
+    setWantedPage(stringOfSorts){this.wantedPage=stringOfSorts;},
     registrering(pnr1,name1,name2,mail,pw1,username1)
     {
         this.pnr=pnr1;
@@ -29,7 +32,7 @@ const model = {
 
         //if success
         this.loggedin=1;
-        console.log("registered and logged in as "+this.username);
+        console.log("registrered and logged in as "+this.username);
 
     },
     loggaIn(username1,pw1)
@@ -37,8 +40,9 @@ const model = {
         this.username=username1;
         this.pw=pw1;
         //database magic
-        //if success
+        //if success either loggedin or both loggedin and recruiter, there are better ways to do this but this is fine as an initial thing i figure
         this.loggedin=1;
+        this.recruiter=1
         console.log("logged in as "+this.username);
     }
     
