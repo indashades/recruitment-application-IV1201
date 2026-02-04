@@ -51,8 +51,11 @@ const idParamsSchema = Joi.object({
   id: Joi.number().integer().positive().required(),
 });
 
+const allowedStatuses = ["unhandled", "accepted", "rejected"];
+
 const patchStatusSchema = Joi.object({
-  status: Joi.string().trim().min(1).max(50).required(),
+  // Must match DB constraint: CHECK (status IN ('unhandled','accepted','rejected'))
+  status: Joi.string().trim().valid(...allowedStatuses).required(),
   version: Joi.number().integer().min(1).required(),
 });
 
