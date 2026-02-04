@@ -17,7 +17,7 @@ function signHmacSha256(data, secret) {
 }
 
 function getJwtSecret() {
-  return process.env.JWT_SECRET || "dev-insecure-secret";
+  return process.env.JWT_SECRET || "dev-secret";
 }
 
 function signJwt(payload, opts = {}) {

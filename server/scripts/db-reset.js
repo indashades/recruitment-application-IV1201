@@ -7,8 +7,8 @@ require("dotenv").config({ path: path.join(__dirname, "..", "src", ".env") });
 
 const DB_HOST = process.env.DB_HOST || "localhost";
 const DB_PORT = Number(process.env.DB_PORT || 5432);
-const DB_USER = process.env.DB_USER || "recruitment_app";
-const DB_PASSWORD = process.env.DB_PASSWORD || "recruitment_app_pw";
+const DB_USER = process.env.DB_USER || "postgres";
+const DB_PASSWORD = process.env.DB_PASSWORD || "postgres";
 const DB_NAME = process.env.DB_NAME || "recruitment_db";
 
 const ROOT = path.join(__dirname, "..");
