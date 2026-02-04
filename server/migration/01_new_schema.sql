@@ -37,9 +37,13 @@ CREATE TABLE IF NOT EXISTS application (
   id BIGSERIAL PRIMARY KEY,
   person_id BIGINT NOT NULL REFERENCES person(id) ON DELETE CASCADE,
   status TEXT NOT NULL CHECK (status IN ('unhandled','accepted','rejected')),
-  submission_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  submission_date DATE NOT NULL DEFAULT CURRENT_DATE,
   version INTEGER NOT NULL DEFAULT 1
 );
+
+ALTER TABLE application
+  ADD COLUMN IF NOT EXISTS submission_date date NOT NULL DEFAULT CURRENT_DATE,
+  ADD COLUMN IF NOT EXISTS version integer NOT NULL DEFAULT 1;
 
 CREATE INDEX IF NOT EXISTS application_person_id_idx ON application(person_id);
 CREATE INDEX IF NOT EXISTS application_submission_date_idx ON application(submission_date);

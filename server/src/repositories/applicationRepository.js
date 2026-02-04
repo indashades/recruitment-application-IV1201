@@ -1,10 +1,14 @@
 const { exec } = require("./db");
 
-async function createApplication(client, { personId, status, submissionDate }) {
+async function createApplication(client, { personId, status }) {
   const r = await exec(
     client,
-    "INSERT INTO application (person_id, status, submission_date, version) VALUES ($1, $2, $3, $4) RETURNING id, person_id, status, submission_date, version",
-    [personId, status, submissionDate, 1]
+    `
+    INSERT INTO application (person_id, status)
+    VALUES ($1, $2)
+    RETURNING id, person_id, status, submission_date, version
+    `,
+    [personId, status]
   );
   return r.rows[0];
 }

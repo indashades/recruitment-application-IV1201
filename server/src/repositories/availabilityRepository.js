@@ -8,7 +8,7 @@ async function bulkInsert(client, applicationId, availability) {
   let i = 1;
 
   for (const a of availability) {
-    values.push(`($${i++}, $${i++}, $${i++})`);
+    values.push(`($${i++}, $${i++}::timestamptz::date, $${i++}::timestamptz::date)`);
     params.push(applicationId, a.fromDate, a.toDate);
   }
 

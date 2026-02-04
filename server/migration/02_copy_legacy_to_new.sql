@@ -1,6 +1,5 @@
 BEGIN;
 
--- 1) Persons
 INSERT INTO person (id, first_name, last_name, email, personnummer)
 SELECT
   p.person_id,
@@ -11,7 +10,6 @@ SELECT
 FROM legacy.person p
 ON CONFLICT (id) DO NOTHING;
 
--- 2) Competences (preserve IDs)
 INSERT INTO competence (id, code, name)
 SELECT
   c.competence_id,
@@ -20,19 +18,16 @@ SELECT
 FROM legacy.competence c
 ON CONFLICT (id) DO NOTHING;
 
--- 3) Applications: one per legacy person (use application.id = person_id)
 INSERT INTO application (id, person_id, status, submission_date, version)
 SELECT
   p.person_id,
   p.person_id,
   'unhandled',
-  NOW(),
+  CURRENT_DATE,
   1
 FROM legacy.person p
 ON CONFLICT (id) DO NOTHING;
 
--- 4) User accounts:
--- recruiters keep username; applicants are missing username/password in the legacy DB.
 INSERT INTO user_account (person_id, username, password_hash, role, needs_password_reset)
 SELECT
   p.person_id,

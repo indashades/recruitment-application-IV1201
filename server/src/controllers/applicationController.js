@@ -29,8 +29,7 @@ async function submitApplication(req, res) {
   const created = await withTransaction(async (client) => {
     const appRow = await applicationRepository.createApplication(client, {
       personId: actor.personId,
-      status: "submitted",
-      submissionDate: new Date(),
+      status: "unhandled",
     });
 
     await competenceProfileRepository.bulkInsert(client, appRow.id, competences);

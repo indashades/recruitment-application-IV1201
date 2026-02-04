@@ -4632,7 +4632,7 @@ COPY legacy.person (person_id, name, surname, pnr, email, password, role_id, use
 755	Dylan	Goodman	20040817-7461	d_goodman2035@finnsinte.se	\N	2	\N
 756	Olivia	Sampson	20030113-5180	s_olivia@finnsinte.se	\N	2	\N
 757	Gretchen	Green	20060516-3881	ggreen@finnsinte.se	\N	2	\N
-758	Zane	O'connor	20020211-6555	z-oconnor6278@finnsinte.se	\N	2	\N
+758	Zane	Oconnor	20020211-6555	z-oconnor6278@finnsinte.se	\N	2	\N
 759	Ciaran	Edwards	20030515-2217	ciaranedwards@finnsinte.se	\N	2	\N
 760	Anika	Russell	20030517-3236	russell_anika7139@finnsinte.se	\N	2	\N
 761	Ima	Bauer	20060319-2345	ibauer706@finnsinte.se	\N	2	\N
