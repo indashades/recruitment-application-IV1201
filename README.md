@@ -6,6 +6,7 @@
 ```
 cd server
 npm install
+npm run db:init / npm run db:reset
 npm run dev
 ```
 
