@@ -1,0 +1,32 @@
+import { LoginView } from "../view/LoginView";
+import { observer } from "mobx-react-lite";
+
+const Login = observer(            
+    
+    
+
+    function LoginRender(model){//model
+        let username=null;
+        let pw=null;
+        function pwa(p){pw=p.target.value;}
+        function ura(p){username=p.target.value;}
+        function changeRegOrLog() {
+                model.model.loggaIn(username,pw);
+                if (model.model.loggedin==1)
+                    {
+                        alert("log in successful");
+                    }
+          }
+          
+          
+        
+        
+        
+
+        return <LoginView /* mayhaps the functions? */   onChange={changeRegOrLog} doPW={pwa} doUsername={ura}  />;
+        
+    }
+);
+
+export { Login };
+    
