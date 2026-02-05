@@ -1,7 +1,10 @@
+````md
 # API v1
 
-Base URL (local): `http://localhost:3000/api/v1`
+Base URL (local): `http://localhost:3000/api/v1`  
 All responses are JSON.
+
+---
 
 ## Response formats
 
@@ -10,9 +13,9 @@ All responses are JSON.
 ```json
 {
   "message": "human readable message",
-  "data": { }
+  "data": {}
 }
-```
+````
 
 ### Error
 
@@ -22,21 +25,28 @@ All responses are JSON.
     "code": "STABLE_CODE",
     "message": "human readable message",
     "requestId": "optional-correlation-id",
-    "details": { }
+    "details": {}
   }
 }
 ```
 
+Notes:
+
+* `error.details` is included for non-5xx errors when available.
+* For 5xx errors, message is generic (`"Internal Server Error"`).
+* Server also sets `x-request-id` response header.
+
 Common error codes:
 
-* `VALIDATION_ERROR` (HTTP 422) – request schema invalid, `error.details.issues` includes field problems
 * `BAD_JSON` (HTTP 400) – invalid JSON body
 * `AUTH_REQUIRED` (HTTP 401) – missing token
-* `AUTH_INVALID` (HTTP 401) – invalid/expired token
+* `AUTH_INVALID` (HTTP 401) – invalid credentials, malformed auth header, or invalid/expired token
 * `FORBIDDEN` (HTTP 403) – wrong role
 * `NOT_FOUND` (HTTP 404)
-* `CONFLICT` (HTTP 409) – optimistic lock conflict
-* `DB_ERROR` (HTTP 500) – server-side database issue (message is generic)
+* `CONFLICT` (HTTP 409) – conflict (including optimistic lock conflict)
+* `VALIDATION_ERROR` (HTTP 422) – request schema invalid, `error.details.issues` includes field problems
+* `DB_ERROR` (HTTP 500) – database-layer error
+* `INTERNAL_ERROR` (HTTP 500) – unexpected server error fallback
 
 ---
 
@@ -59,6 +69,20 @@ Body
 }
 ```
 
+Validation rules:
+
+* `username`: string, trimmed, length `3..50`
+* `password`: string, length `8..200`
+* `firstName`: string, trimmed, length `1..100`
+* `lastName`: string, trimmed, length `1..100`
+* `email`: valid email
+* `personnummer`: one of:
+
+  * `YYMMDD-XXXX`
+  * `YYYYMMDD-XXXX`
+  * `YYMMDDXXXX`
+  * `YYYYMMDDXXXX`
+
 Success (201)
 
 ```json
@@ -77,7 +101,8 @@ Success (201)
 
 Notes:
 
-* `role` is created as `"applicant"` by default.
+* `role` is always created as `"applicant"`.
+* Duplicate username returns `CONFLICT` (409).
 
 ---
 
@@ -106,11 +131,15 @@ Success (200)
 }
 ```
 
-Save the token and send it on protected endpoints:
+Failure (401)
+
+* Invalid credentials => `AUTH_INVALID`
+
+Send token on protected endpoints:
 
 Header
 
-```
+```http
 Authorization: Bearer <token>
 ```
 
@@ -122,7 +151,7 @@ Authorization: Bearer <token>
 
 Headers
 
-```
+```http
 Authorization: Bearer <token>
 ```
 
@@ -146,6 +175,10 @@ Success (200)
   }
 }
 ```
+
+Notes:
+
+* `data.person` can be `null` (e.g., if `personId` is missing/unresolved).
 
 ---
 
@@ -182,7 +215,7 @@ Auth
 
 Headers
 
-```
+```http
 Authorization: Bearer <token>
 Content-Type: application/json
 ```
@@ -192,7 +225,7 @@ Body
 ```json
 {
   "competences": [
-    { "competenceId": 1, "yearsOfExperience": 5 }
+    { "competenceId": 1, "yearsOfExperience": 5.5 }
   ],
   "availability": [
     { "fromDate": "2026-01-01", "toDate": "2026-06-30" }
@@ -203,9 +236,10 @@ Body
 Rules:
 
 * `competences` must be a non-empty array
-* `yearsOfExperience` is an integer (0–80)
+* `competenceId` must be a positive integer
+* `yearsOfExperience` is a number `0..80` (max 2 decimals)
 * `availability` must be a non-empty array
-* `fromDate` / `toDate` must be ISO date strings; `fromDate <= toDate`
+* `fromDate` / `toDate` must be ISO dates, and `fromDate <= toDate`
 
 Success (201)
 
@@ -214,12 +248,17 @@ Success (201)
   "message": "Application submitted",
   "data": {
     "applicationId": 10,
-    "status": "submitted",
-    "submissionDate": "2026-02-02T13:35:12.345Z",
+    "status": "unhandled",
+    "submissionDate": "2026-02-02",
     "version": 1
   }
 }
 ```
+
+Notes:
+
+* New applications are created with status `"unhandled"`.
+* `submissionDate` is date-only (`YYYY-MM-DD`).
 
 ---
 
@@ -249,12 +288,17 @@ Success (200)
     {
       "applicationId": 10,
       "fullName": "FName LName",
-      "status": "submitted",
-      "submissionDate": "2026-02-02T13:35:12.345Z"
+      "status": "unhandled",
+      "submissionDate": "2026-02-02"
     }
   ]
 }
 ```
+
+Notes:
+
+* Server currently limits recruiter list to max `50` rows.
+* `sortKey=fullName` is implemented as last-name sort.
 
 ---
 
@@ -278,8 +322,8 @@ Success (200)
   "message": "Application retrieved",
   "data": {
     "applicationId": 10,
-    "status": "submitted",
-    "submissionDate": "2026-02-02T13:35:12.345Z",
+    "status": "unhandled",
+    "submissionDate": "2026-02-02",
     "version": 1,
     "person": {
       "personId": 1,
@@ -292,7 +336,7 @@ Success (200)
         "competenceId": 1,
         "code": "JAVA",
         "name": "Java",
-        "yearsOfExperience": 5
+        "yearsOfExperience": 5.5
       }
     ],
     "availability": [
@@ -315,7 +359,7 @@ Auth
 
 Headers
 
-```
+```http
 Authorization: Bearer <token>
 Content-Type: application/json
 ```
@@ -324,15 +368,16 @@ Body
 
 ```json
 {
-  "status": "approved",
+  "status": "accepted",
   "version": 1
 }
 ```
 
 Rules:
 
-* `version` must match the current application version.
-* On success, the server increments version.
+* Allowed `status` values: `unhandled` | `accepted` | `rejected`
+* `version` must match current application version
+* On success, server increments version
 
 Success (200)
 
@@ -341,14 +386,13 @@ Success (200)
   "message": "Application status updated",
   "data": {
     "applicationId": 10,
-    "status": "approved",
+    "status": "accepted",
     "version": 2
   }
 }
 ```
 
 Conflict (409)
-If someone updated the application in the meantime:
 
 ```json
 {
@@ -393,11 +437,3 @@ Degraded (503) (DB unavailable)
   "data": { "status": "degraded", "db": "down" }
 }
 ```
-
----
-
-## Minimal client checklist
-
-* Always parse response as JSON.
-* If the response contains `error`, use `error.code` for logic and show `error.message` to the user.
-* Send `Authorization: Bearer <token>` for protected routes.
