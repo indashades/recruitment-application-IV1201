@@ -14,10 +14,10 @@ async function exec(client, text, params) {
       detail: root && root.detail,
       where: root && root.where,
     });
-  };
-  console.error("QUERY:", { text, params });
-  if (err instanceof DbError) throw err;
-  throw new DbError("Database query error", { cause: err });
+    console.error("QUERY:", { text, params });
+    if (err instanceof DbError) throw err;
+    throw new DbError("Database query error", { cause: err });
+  }
 }
 
 module.exports = { exec };
