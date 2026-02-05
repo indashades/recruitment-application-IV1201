@@ -63,6 +63,8 @@ async function login(req, res) {
     success: ok,
   });
 
+
+
   if (!ok) {
     throw new AuthError("Invalid credentials", { code: "AUTH_INVALID" });
   }

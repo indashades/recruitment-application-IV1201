@@ -1,3 +1,4 @@
+import { login, register } from "./asyncThings";
 /*(person_id, name, surname, pnr, email, password, role_id, username)*/
 
 const model = {  
@@ -14,12 +15,22 @@ const model = {
     loggedin: 0,
     recruiter: 0,
     wantedPage: "#/",
-    //will add an applications list here soon for the recruiter to view but am waiting to see if we want to put the 2 together first
+    applications: [],
+    
     //i have a way to view these done but not yet commited
 
     //functions
     setWantedPage(stringOfSorts){this.wantedPage=stringOfSorts;},
-    registrering(pnr1,name1,name2,mail,pw1,username1)
+
+
+
+    //functions that need api
+    application(fromDate,toDate,yearsTicket,yearsLotteries,yearsRoller)
+    {
+        console.log("application submitted")
+        //does nothing yet but should submit an application
+    },
+    async registrering(pnr1,name1,name2,mail,pw1,username1)
     {
         this.pnr=pnr1;
         this.name=name1;
@@ -29,17 +40,43 @@ const model = {
         this.username=username1;
 
         //database magic
-
+        const result = await register(this.username, this.pw,this.name,this.surname,this.email,this.pnr);
+        this.user = {
+            role: result.role,
+            isAuthenticated: true
+        };
+        console.log( this.user);
         //if success
         this.loggedin=1;
         console.log("registrered and logged in as "+this.username);
 
     },
-    loggaIn(username1,pw1)
+    async loggaIn(username1,pw1)
     {
         this.username=username1;
         this.pw=pw1;
         //database magic
+        
+        
+
+        
+
+        
+        const result = await login(this.username, this.pw);
+        this.user = {
+            role: result.role,
+            isAuthenticated: true
+        };
+        console.log( this.user);
+        
+        /*test this one has login and username
+        COPY public.person (person_id, name, surname, pnr, email, password, role_id, username) FROM stdin;
+        1    Joelle    Wilkinson    \N    \N    LiZ98qvL8Lw    1    JoelleWilkinson
+        */
+
+
+        
+
         //if success either loggedin or both loggedin and recruiter, there are better ways to do this but this is fine as an initial thing i figure
         this.loggedin=1;
         this.recruiter=1
