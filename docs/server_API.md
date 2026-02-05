@@ -61,8 +61,8 @@ Body
 ```json
 {
   "username": "username",
-  "password": "password123",
-  "firstName": "FName",
+  "password": "password",
+  "firstName": "FName",//guh you use firstName and lastName not FName and LName
   "lastName": "LName",
   "email": "email@example.com",
   "personnummer": "199001011234"
@@ -114,8 +114,8 @@ Body
 
 ```json
 {
-  "username": "username",
-  "password": "password123"
+  "username": "useraname",//useraname??? i assume you just meant username considering that is what it says in the rest of the code
+  "password": "password"
 }
 ```
 

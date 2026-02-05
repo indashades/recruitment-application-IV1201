@@ -7,6 +7,7 @@ import { Register } from "./RegisterPresenter";
 import { Login } from "./LoginPresenter";
 import { Regorlog } from "./regorlogPresenter";
 import { model } from "../EmploymentModel";
+import { Apply } from "./applyPresenter";
 
 function makeRouter() {
   return createHashRouter([
@@ -25,6 +26,10 @@ function makeRouter() {
     {
       path: "/RegOrLog",
       element: <Regorlog  model={model}/>,
+    },
+    {
+      path: "/Appl",
+      element: <Apply  model={model}/>,
     },
   ]);
 }
