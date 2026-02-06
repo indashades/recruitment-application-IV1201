@@ -1,7 +1,7 @@
 
-const BASE_URL = "http://localhost:3001/api/v1";
+const BASE_URL = "http://localhost:3000/api/v1";
 
-let token = null;
+export let token = null;
 
 export function setToken(newToken) {
   token = newToken;

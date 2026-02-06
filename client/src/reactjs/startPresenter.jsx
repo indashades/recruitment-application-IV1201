@@ -13,10 +13,10 @@ const Start = observer(
           }
           function viewApplicants(){if(model.model.recruiter==0)
             {
-                model.model.setWantedPage("#/viewAppl");
+                model.model.setWantedPage("#/rec");
                 window.location.hash = "#/RegOrLog";
             }
-            else{window.location.hash = "#/viewAppl";}
+            else{window.location.hash = "#/rec";}
         }
           function apply(){if(model.model.loggedin==0)
             {

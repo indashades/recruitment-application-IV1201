@@ -1,5 +1,6 @@
 
-import { request, setToken } from "./api";
+import { request, setToken, token } from "./api";
+
 
 export async function login(username, password) {
   if (!username || !password) {
@@ -13,7 +14,7 @@ export async function login(username, password) {
 
   // Persist token (model concern)
   setToken(data.token);
-  localStorage.setItem("authToken", data.token);
+  console.log(data.token);
   console.log(data.role);
 
   return {
@@ -50,3 +51,28 @@ export async function register(username, password,firstName,lastName,email,perso
       role: data.role
     };
   }
+
+  
+export async function submitApplication(competences, availability) {
+  if (!competences || competences.length === 0) {
+    alert("shouldnt be possible")
+    return; 
+  }
+  if (!availability || availability.length === 0) {
+    alert("shouldnt be possible")
+    return;
+  }
+
+  const data = await request("/applications", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ competences, availability })
+  });
+
+  // data contains applicationId, status, submissionDate, version
+  return data;
+}
+
