@@ -19,7 +19,7 @@ const Register = observer(
         function name1a(p){name1=p.target.value;}
         function name2a(p){name2=p.target.value;}
         function maila(p){mail=p.target.value;}
-        function changeRegOrLog() {
+        async function changeRegOrLog() {
             
                 if(pw==null){alert("missing password");}
                 else if(username==null){alert("missing username");}
@@ -31,9 +31,9 @@ const Register = observer(
 
                 else
                 {
-                    model.model.registrering(pnr,name1,name2,mail,pw,username);
+                    await model.model.registrering(pnr,name1,name2,mail,pw,username);
                 }
-                if (model.model.loggedin==1)
+                if (model.model.loggedin===1)
                 {
                     alert("log in successful");
                     window.location.hash = model.model.wantedPage;
