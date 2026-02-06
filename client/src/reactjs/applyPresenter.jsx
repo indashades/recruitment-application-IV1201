@@ -16,12 +16,12 @@ const Apply = observer(
         function ura1(p){yearsTicket=p.target.value;}
         function ura2(p){yearsLotteries=p.target.value;}
         function ura3(p){yearsRoller=p.target.value;}
-        function applybutton() {
+        async function applybutton() {
                 
-                if (model.model.loggedin==0)//1 for true thing when database works
+                if (model.model.loggedin===1)//1 for true thing when database works
                     {
                         //apply
-                        model.model.application(avalablefrom,avalableto,yearsTicket,yearsLotteries,yearsRoller);
+                        await model.model.application(avalablefrom,avalableto,yearsTicket,yearsLotteries,yearsRoller);
                     }
                 else
                 {

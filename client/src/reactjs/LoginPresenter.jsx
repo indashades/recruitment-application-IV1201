@@ -10,9 +10,9 @@ const Login = observer(
         let pw=null;
         function pwa(p){pw=p.target.value;}
         function ura(p){username=p.target.value;}
-        function changeRegOrLog() {
-                model.model.loggaIn(username,pw);
-                if (model.model.loggedin==1)
+        async function changeRegOrLog() {
+                await model.model.loggaIn(username,pw);
+                if (model.model.loggedin === 1)
                     {
                         alert("log in successful");
                         window.location.hash = model.model.wantedPage;

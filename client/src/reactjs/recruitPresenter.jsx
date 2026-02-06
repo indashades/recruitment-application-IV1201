@@ -10,9 +10,9 @@ const Recruit = observer(
         let search=null;
         function pwa(p){search=p.target.value;}
         function ura(p){status=p.target.value;}
-        function changeRegOrLog() {
+        async function changeRegOrLog() {
                 model.model.makeApp();
-                if (model.model.loggedin==0)//ändra till 1
+                if (model.model.loggedin===1)//ändra till 1
                     {
                         //do stuff
                         window.location.hash = "#/";
