@@ -18,7 +18,7 @@ const Apply = observer(
         function ura3(p){yearsRoller=p.target.value;}
         function applybutton() {
                 
-                if (model.model.loggedin==1)
+                if (model.model.loggedin==0)//1 for true thing when database works
                     {
                         //apply
                         model.model.application(avalablefrom,avalableto,yearsTicket,yearsLotteries,yearsRoller);

@@ -1,4 +1,4 @@
-import { login, register } from "./asyncThings";
+import { login, register, submitApplication } from "./asyncThings";
 /*(person_id, name, surname, pnr, email, password, role_id, username)*/
 
 const model = {  
@@ -12,24 +12,72 @@ const model = {
     pw: null,
     role_id: null,
     username: null,
-    loggedin: 0,
-    recruiter: 0,
+    loggedin: 0,//auth för applicants
+    recruiter: 0,//auth för recruiter
     wantedPage: "#/",
     applications: [],
+    token: null,
     
     //i have a way to view these done but not yet commited
 
     //functions
     setWantedPage(stringOfSorts){this.wantedPage=stringOfSorts;},
-
-
-
-    //functions that need api
-    application(fromDate,toDate,yearsTicket,yearsLotteries,yearsRoller)
+    setToken2(token){this.token=token;},
+    makeApp()
     {
-        console.log("application submitted")
-        //does nothing yet but should submit an application
+      this.applications=[
+        {
+          applicationId: 10,
+          fullName: "FName LName",
+          status: "unhandled",
+          submissionDate: "2026-02-02"
+        },
+        {
+          applicationId: 10,
+          fullName: "FName LName",
+          status: "unhandled",
+          submissionDate: "2026-02-02"
+        }
+      ];
     },
+
+
+    /*
+{
+  "competences": [
+    { "competenceId": 1, "yearsOfExperience": 5.5 }
+  ],
+  "availability": [
+    { "fromDate": "2026-01-01", "toDate": "2026-06-30" }
+  ]
+}
+    */
+    //functions that need api
+    async onSearch(name,status){},
+    async application(fromDate, toDate, yearsTicket, yearsLotteries, yearsRoller) {
+        // Build competences array
+        const competences = [
+          { competenceId: 1, yearsOfExperience: yearsTicket },
+          { competenceId: 2, yearsOfExperience: yearsLotteries },
+          { competenceId: 3, yearsOfExperience: yearsRoller }
+        ];
+      
+        // Build availability array (backend expects array of {fromDate, toDate})
+        const availability = [
+          { fromDate, toDate }
+        ];
+      
+        // Call the async submitApplication function
+        const result = await submitApplication(competences, availability);
+      
+        // You can store application info or user info if needed
+        this.user = {
+          
+          isAuthenticated: true
+        };
+        console.log("Application submitted");
+      },
+      
     async registrering(pnr1,name1,name2,mail,pw1,username1)
     {
         this.pnr=pnr1;
@@ -40,15 +88,16 @@ const model = {
         this.username=username1;
 
         //database magic
+        try{
         const result = await register(this.username, this.pw,this.name,this.surname,this.email,this.pnr);
-        this.user = {
-            role: result.role,
-            isAuthenticated: true
-        };
-        console.log( this.user);
+        
+            
+            
         //if success
         this.loggedin=1;
         console.log("registrered and logged in as "+this.username);
+          }
+          catch{alert("registration failed");}//temp ska flyttas men då jag inte kan testa saker så gör jag den här snabbt
 
     },
     async loggaIn(username1,pw1)
@@ -61,13 +110,12 @@ const model = {
 
         
 
-        
+        try{
         const result = await login(this.username, this.pw);
-        this.user = {
-            role: result.role,
-            isAuthenticated: true
-        };
-        console.log( this.user);
+        if( result.role=="recruiter")
+          {
+            this.recruiter=1;
+          }
         
         /*test this one has login and username
         COPY public.person (person_id, name, surname, pnr, email, password, role_id, username) FROM stdin;
@@ -79,8 +127,9 @@ const model = {
 
         //if success either loggedin or both loggedin and recruiter, there are better ways to do this but this is fine as an initial thing i figure
         this.loggedin=1;
-        this.recruiter=1
         console.log("logged in as "+this.username);
+        }
+        catch{alert("login failed");}
     }
     
  
