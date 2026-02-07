@@ -23,15 +23,14 @@ async function request(path, options = {}) {
     headers,
   });
 
-  const json = await res.json();
+  const text = await res.text();
+  const json = text ? JSON.parse(text) : {};
 
   if (!res.ok) {
-    throw (
-      json.error ?? {
-        code: "UNKNOWN",
-        message: "Unknown error",
-      }
-    );
+    throw json.error ?? {
+      code: "UNKNOWN",
+      message: "Unknown error",
+    };
   }
 
   return json.data;

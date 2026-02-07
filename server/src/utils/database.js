@@ -1,27 +1,22 @@
 const { Pool } = require("pg");
 const { DbError } = require("../errors");
 
-function buildPoolConfig() {
-  const useSsl = process.env.DB_SSL === "true" || !!process.env.DATABASE_URL;
+const useConnectionString = !!process.env.DATABASE_URL;
 
-  if (process.env.DATABASE_URL) {
-    return {
-      connectionString: process.env.DATABASE_URL,
-      ssl: useSsl ? { rejectUnauthorized: false } : false,
-    };
-  }
-
-  return {
-    user: process.env.DB_USER || "postgres",
-    password: process.env.DB_PASSWORD || "postgres",
-    host: process.env.DB_HOST || "localhost",
-    port: Number(process.env.DB_PORT || 5432),
-    database: process.env.DB_NAME || "recruitment_db",
-    ssl: useSsl ? { rejectUnauthorized: false } : false,
-  };
-}
-
-const pool = new Pool(buildPoolConfig());
+const pool = new Pool(
+  useConnectionString
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
+      }
+    : {
+        user: process.env.DB_USER || "postgres",
+        password: process.env.DB_PASSWORD || "postgres",
+        host: process.env.DB_HOST || "localhost",
+        port: process.env.DB_PORT || 5432,
+        database: process.env.DB_NAME || "recruitment_db",
+      }
+);
 
 pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
@@ -35,9 +30,7 @@ async function query(text, params) {
     console.log("Executed query", { text, duration, rows: result.rowCount });
     return result;
   } catch (error) {
-    throw new DbError("Database query error", {
-      cause: error,
-    });
+    throw new DbError("Database query error", { cause: error });
   }
 }
 
