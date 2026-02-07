@@ -1,5 +1,6 @@
+import { API_BASE_URL } from "./api/config";
 
-const BASE_URL = "http://localhost:3000/api/v1";
+const BASE_URL = API_BASE_URL.replace(/\/$/, "");
 
 export let token = null;
 
@@ -10,7 +11,7 @@ export function setToken(newToken) {
 async function request(path, options = {}) {
   const headers = {
     "Content-Type": "application/json",
-    ...options.headers
+    ...options.headers,
   };
 
   if (token) {
@@ -19,17 +20,18 @@ async function request(path, options = {}) {
 
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    headers
+    headers,
   });
 
   const json = await res.json();
 
   if (!res.ok) {
-    
-    throw json.error ?? {
-      code: "UNKNOWN",
-      message: "Unknown error"
-    };
+    throw (
+      json.error ?? {
+        code: "UNKNOWN",
+        message: "Unknown error",
+      }
+    );
   }
 
   return json.data;
