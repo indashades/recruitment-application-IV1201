@@ -1,5 +1,3 @@
-BEGIN;
-
 CREATE TABLE IF NOT EXISTS schema_migrations (
   id TEXT PRIMARY KEY,
   applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -69,29 +67,11 @@ CREATE TABLE IF NOT EXISTS availability (
 CREATE UNIQUE INDEX IF NOT EXISTS availability_uq
   ON availability(application_id, from_date, to_date);
 
-CREATE INDEX IF NOT EXISTS availability_application_id_idx ON availability(application_id);
+CREATE INDEX IF NOT EXISTS availability_application_id_idx
+  ON availability(application_id);
 
 INSERT INTO competence (code, name) VALUES
   ('TICKET', 'Ticket sales'),
   ('LOTTERY', 'Lotteries'),
   ('ROLLER', 'Roller coaster operation')
-ON CONFLICT (code) DO NOTHING;
-
--- username: recruiter
--- password: Recruiter123!
-INSERT INTO person (first_name, last_name, email, personnummer)
-VALUES ('Demo', 'Recruiter', 'recruiter@example.com', '19900101-9999')
-ON CONFLICT (email) DO NOTHING;
-
-INSERT INTO user_account (person_id, username, password_hash, role, needs_password_reset)
-SELECT
-  p.id,
-  'recruiter',
-  'scrypt$16384$8$1$6ecb00742c1b3fe10933d08b47402660$9e452fdd9894141ce43f37fee30dc2c7e2925dfe6e5902702a4df9a4d6f31f3d2788ba923ed3a04d89da1e213137a8de2a33452ff0fdca853fd0b2b841660f58',
-  'recruiter',
-  FALSE
-FROM person p
-WHERE p.email = 'recruiter@example.com'
-ON CONFLICT (username) DO NOTHING;
-
-COMMIT;
+ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name;
