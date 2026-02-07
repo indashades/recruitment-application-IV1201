@@ -8,7 +8,9 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "db:init": "node scripts/db-init.js",
-    "db:reset": "node scripts/db-reset.js"
+    "db:reset": "node scripts/db-reset.js",
+    "db:init:cloud": "node scripts/db-init-cloud.js",
+    "db:reset:cloud": "node scripts/db-reset-cloud.js"
   },
   "keywords": [],
   "author": "",

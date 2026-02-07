@@ -1,7 +1,16 @@
 import { render, screen } from "@testing-library/react";
-import { ReactRoot } from "./reactjs/ReactRoot";
+import { StartView } from "./view/StartView";
 
-test("renders welcome screen", async () => {
-  render(<ReactRoot />);
-  expect(await screen.findByText(/welcome/i)).toBeInTheDocument();
+test("shows the welcome screen", () => {
+  render(
+    <StartView
+      onChange={() => {}}
+      viewAppl={() => {}}
+      apply={() => {}}
+    />
+  );
+
+  expect(
+    screen.getByRole("heading", { name: /welcome/i })
+  ).toBeInTheDocument();
 });
