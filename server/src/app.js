@@ -6,6 +6,10 @@ const { notFound } = require("./middleware/notFound");
 const { requestId } = require("./middleware/requestId");
 const { errorHandler } = require("./middleware/errorHandler");
 
+/**
+* Configured Express application instance.
+* @type {import("express").Express}
+*/
 const app = express();
 
 // minimal, dev-friendly middleware
