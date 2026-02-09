@@ -8,6 +8,12 @@ function isBadJsonError(err) {
   );
 }
 
+/**
+ * Converts unknown thrown values to a normalized `AppError` instance.
+ *
+ * @param {unknown} err
+ * @returns {AppError}
+ */
 function normalizeError(err) {
   if (isBadJsonError(err)) {
     const e = new ValidationError("Invalid JSON", { reason: "BAD_JSON" }, { status: 400 });

@@ -20,6 +20,13 @@ function getJwtSecret() {
   return process.env.JWT_SECRET || "dev-secret";
 }
 
+/**
+ * Signs a JWT with HS256.
+ *
+ * @param {Record<string, any>} payload
+ * @param {{expiresInSeconds?: number}} [opts]
+ * @returns {string}
+ */
 function signJwt(payload, opts = {}) {
   const secret = getJwtSecret();
   const now = Math.floor(Date.now() / 1000);
@@ -39,6 +46,13 @@ function signJwt(payload, opts = {}) {
   return `${signingInput}.${sig}`;
 }
 
+/**
+ * Verifies JWT signature and expiry.
+ *
+ * @param {string} token
+ * @returns {Record<string, any>}
+ * @throws {Error} If token is malformed, invalid, or expired.
+ */
 function verifyJwt(token) {
   const secret = getJwtSecret();
   const parts = String(token).split(".");

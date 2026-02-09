@@ -12,9 +12,13 @@ const { competenceProfileRepository } = require("../repositories/competenceProfi
 const { availabilityRepository } = require("../repositories/availabilityRepository");
 
 /**
- * Applicant: POST /api/v1/applications
- * Payload: { competences: [{ competenceId, yearsOfExperience }], availability: [{ fromDate, toDate }] }
- * Auth: applicant
+ * Creates a new application for the authenticated applicant.
+ * Route: `POST /api/v1/applications` (auth: applicant).
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>} Sends HTTP 201 with created application metadata.
+ * @throws {ValidationError} If authenticated user context is missing `personId`.
  */
 async function submitApplication(req, res) {
   const actor = req.user;
@@ -56,9 +60,12 @@ async function submitApplication(req, res) {
 }
 
 /**
- * Recruiter: GET /api/v1/applications
- * Query: ?sortKey=submissionDate|status|fullName&direction=asc|desc
- * Auth: recruiter
+ * Lists applications for recruiters with optional sorting.
+ * Route: `GET /api/v1/applications` (auth: recruiter).
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>} Sends HTTP 200 with recruiter list view.
  */
 async function listApplications(req, res) {
   const { sortKey, direction } = req.query;
@@ -79,8 +86,13 @@ async function listApplications(req, res) {
 }
 
 /**
- * Recruiter: GET /api/v1/applications/:id
- * Auth: recruiter
+ * Retrieves full recruiter details for a single application.
+ * Route: `GET /api/v1/applications/:id` (auth: recruiter).
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>} Sends HTTP 200 with detailed application data.
+ * @throws {NotFoundError} If no application exists for the given id.
  */
 async function getApplicationById(req, res) {
   const applicationId = Number(req.params.id);
@@ -118,9 +130,13 @@ async function getApplicationById(req, res) {
 }
 
 /**
- * Recruiter: PATCH /api/v1/applications/:id/status
- * Body: { status, version }
- * Auth: recruiter
+ * Updates application status using optimistic locking (`version`).
+ * Route: `PATCH /api/v1/applications/:id/status` (auth: recruiter).
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>} Sends HTTP 200 with updated status/version.
+ * @throws {ConflictError} If the version check fails.
  */
 async function updateApplicationStatus(req, res) {
   const actor = req.user;

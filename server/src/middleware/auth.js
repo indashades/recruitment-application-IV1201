@@ -1,6 +1,11 @@
 const { AuthError, ForbiddenError } = require("../errors");
 const { verifyJwt } = require("../utils/jwt");
 
+/**
+ * Creates authentication middleware that validates Bearer JWT and sets `req.user`.
+ *
+ * @returns {import("express").RequestHandler}
+ */
 function authenticate() {
   return (req, res, next) => {
     const header = req.headers["authorization"];
@@ -27,6 +32,12 @@ function authenticate() {
   };
 }
 
+/**
+ * Creates authorization middleware that enforces one required role.
+ *
+ * @param {string} requiredRole
+ * @returns {import("express").RequestHandler}
+ */
 function authorize(requiredRole) {
   return (req, res, next) => {
     if (!req.user) return next(new AuthError("Authentication required", { code: "AUTH_REQUIRED" }));

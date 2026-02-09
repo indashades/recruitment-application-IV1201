@@ -1,5 +1,13 @@
 const { exec } = require("./db");
 
+/**
+ * Bulk-inserts availability intervals for an application.
+ *
+ * @param {import("pg").PoolClient} client
+ * @param {number} applicationId
+ * @param {Array<{fromDate:string, toDate:string}>} availability
+ * @returns {Promise<void>}
+ */
 async function bulkInsert(client, applicationId, availability) {
   if (!Array.isArray(availability) || availability.length === 0) return;
 

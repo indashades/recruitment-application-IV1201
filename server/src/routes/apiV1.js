@@ -1,4 +1,9 @@
 const express = require("express");
+
+/**
+ * Main API v1 router.
+ * @type {import("express").Router}
+ */
 const router = express.Router();
 const { asyncHandler } = require("../utils/asyncHandler");
 

@@ -1,5 +1,10 @@
 const express = require("express");
 const Joi = require("joi");
+
+/**
+ * Applications router.
+ * @type {import("express").Router}
+ */
 const router = express.Router();
 
 const { asyncHandler } = require("../utils/asyncHandler");

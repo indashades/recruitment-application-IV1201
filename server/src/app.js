@@ -12,7 +12,7 @@ const { errorHandler } = require("./middleware/errorHandler");
 */
 const app = express();
 
-// minimal, dev-friendly middleware
+// middleware
 app.use(cors());
 app.use(express.json());
 app.use(requestId());

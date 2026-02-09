@@ -1,4 +1,9 @@
 const express = require("express");
+
+/**
+ * Competences router.
+ * @type {import("express").Router}
+ */
 const router = express.Router();
 const { asyncHandler } = require("../utils/asyncHandler");
 
