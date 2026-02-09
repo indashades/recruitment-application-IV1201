@@ -1,6 +1,15 @@
 const { query } = require("../utils/database");
 const { DbError } = require("../errors");
 
+/**
+ * Executes SQL using a transaction client when provided, otherwise pool query helper.
+ *
+ * @param {import("pg").PoolClient|null} client
+ * @param {string} text
+ * @param {any[]} [params]
+ * @returns {Promise<import("pg").QueryResult<any>>}
+ * @throws {DbError}
+ */
 async function exec(client, text, params) {
   try {
     if (client) return await client.query(text, params);

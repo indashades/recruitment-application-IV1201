@@ -1,5 +1,13 @@
 const { exec } = require("./db");
 
+/**
+ * Bulk-inserts competence profile records for an application.
+ *
+ * @param {import("pg").PoolClient} client
+ * @param {number} applicationId
+ * @param {Array<{competenceId:number, yearsOfExperience:number}>} competences
+ * @returns {Promise<void>}
+ */
 async function bulkInsert(client, applicationId, competences) {
   if (!Array.isArray(competences) || competences.length === 0) return;
 

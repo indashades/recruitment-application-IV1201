@@ -1,5 +1,12 @@
 const { exec } = require("./db");
 
+/**
+ * Creates a user account record.
+ *
+ * @param {import("pg").PoolClient} client
+ * @param {{personId:number, username:string, passwordHash:string, role:string}} input
+ * @returns {Promise<{id:number, person_id:number, username:string, role:string}>}
+ */
 async function createUserAccount(client, { personId, username, passwordHash, role }) {
   const r = await exec(
     client,
@@ -9,6 +16,12 @@ async function createUserAccount(client, { personId, username, passwordHash, rol
   return r.rows[0];
 }
 
+/**
+ * Finds a user account by username.
+ *
+ * @param {string} username
+ * @returns {Promise<null|{id:number, person_id:number, username:string, password_hash:string, role:string}>}
+ */
 async function findByUsername(username) {
   const r = await exec(
     null,

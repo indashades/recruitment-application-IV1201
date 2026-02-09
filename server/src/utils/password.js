@@ -19,6 +19,12 @@ function defaultScryptParams() {
   };
 }
 
+/**
+ * Hashes plaintext password with scrypt and encoded parameters.
+ *
+ * @param {string} password
+ * @returns {Promise<string>}
+ */
 async function hashPassword(password) {
   const params = defaultScryptParams();
   const salt = crypto.randomBytes(16).toString("hex");
@@ -27,6 +33,13 @@ async function hashPassword(password) {
   return `scrypt$${params.N}$${params.r}$${params.p}$${salt}$${hashHex}`;
 }
 
+/**
+ * Verifies plaintext password against stored scrypt hash string.
+ *
+ * @param {string} password
+ * @param {string} stored
+ * @returns {Promise<boolean>}
+ */
 async function verifyPassword(password, stored) {
   try {
     const parts = String(stored).split("$");

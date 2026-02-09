@@ -11,6 +11,12 @@ function formatJoiError(error) {
   };
 }
 
+/**
+ * Creates Joi-based validation middleware for request body/query/params.
+ *
+ * @param {{body?: import("joi").Schema, query?: import("joi").Schema, params?: import("joi").Schema}} [schemas]
+ * @returns {import("express").RequestHandler}
+ */
 function validate(schemas = {}) {
   return (req, res, next) => {
     try {

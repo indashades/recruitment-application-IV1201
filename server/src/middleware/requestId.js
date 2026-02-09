@@ -1,5 +1,10 @@
 const crypto = require("crypto");
 
+/**
+ * Creates middleware that propagates or generates `x-request-id`.
+ *
+ * @returns {import("express").RequestHandler}
+ */
 function requestId() {
   return (req, res, next) => {
     const incoming =

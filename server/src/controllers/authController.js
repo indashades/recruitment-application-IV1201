@@ -7,6 +7,14 @@ const { AuthError, ConflictError } = require("../errors");
 const { userRepository } = require("../repositories/userRepository");
 const { personRepository } = require("../repositories/personRepository");
 
+/**
+ * Registers a new applicant account.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>} Sends HTTP 201 with created user metadata.
+ * @throws {ConflictError} If username already exists.
+ */
 async function register(req, res) {
   const { username, password, firstName, lastName, email, personnummer } = req.body;
 
@@ -52,6 +60,14 @@ async function register(req, res) {
   });
 }
 
+/**
+ * Authenticates a user and returns a signed JWT.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>} Sends HTTP 200 with token and role.
+ * @throws {AuthError} If credentials are invalid.
+ */
 async function login(req, res) {
   const { username, password } = req.body;
   const user = await userRepository.findByUsername(username);
@@ -84,6 +100,13 @@ async function login(req, res) {
   });
 }
 
+/**
+ * Returns the authenticated user context and linked person profile.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>} Sends HTTP 200 with current user information.
+ */
 async function me(req, res) {
   const actor = req.user;
   const person = actor && actor.personId

@@ -1,5 +1,12 @@
 const { exec } = require("./db");
 
+/**
+ * Inserts a new application row.
+ *
+ * @param {import("pg").PoolClient} client
+ * @param {{personId:number, status:string}} input
+ * @returns {Promise<{id:number, person_id:number, status:string, submission_date:string, version:number}>}
+ */
 async function createApplication(client, { personId, status }) {
   const r = await exec(
     client,
@@ -13,6 +20,12 @@ async function createApplication(client, { personId, status }) {
   return r.rows[0];
 }
 
+/**
+ * Returns recruiter list view of applications.
+ *
+ * @param {{sortKey?: "submissionDate"|"status"|"fullName", direction?: "asc"|"desc", limit?: number}} [options]
+ * @returns {Promise<Array<any>>}
+ */
 async function listForRecruiter({ sortKey = "submissionDate", direction = "desc", limit = 50 }) {
   const dir = String(direction).toLowerCase() === "asc" ? "ASC" : "DESC";
 
@@ -40,6 +53,12 @@ async function listForRecruiter({ sortKey = "submissionDate", direction = "desc"
   return r.rows;
 }
 
+/**
+ * Loads full recruiter details for one application.
+ *
+ * @param {number} applicationId
+ * @returns {Promise<null|{application:any, person:any, competences:any[], availability:any[]}>}
+ */
 async function getDetailsForRecruiter(applicationId) {
   const header = await exec(
     null,
@@ -108,6 +127,12 @@ async function getDetailsForRecruiter(applicationId) {
   };
 }
 
+/**
+ * Updates status when the expected row version matches.
+ *
+ * @param {{applicationId:number, status:string, version:number}} input
+ * @returns {Promise<null|{id:number, status:string, version:number}>}
+ */
 async function updateStatusWithOptimisticLock({ applicationId, status, version }) {
   const r = await exec(
     null,

@@ -3,6 +3,10 @@ const { DbError } = require("../errors");
 
 const useConnectionString = !!process.env.DATABASE_URL;
 
+/**
+ * Shared PostgreSQL connection pool.
+ * @type {import("pg").Pool}
+ */
 const pool = new Pool(
   useConnectionString
     ? {
@@ -22,6 +26,14 @@ pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
 });
 
+/**
+ * Executes SQL against the shared pool.
+ *
+ * @param {string} text
+ * @param {any[]} [params]
+ * @returns {Promise<import("pg").QueryResult<any>>}
+ * @throws {DbError}
+ */
 async function query(text, params) {
   const start = Date.now();
   try {
@@ -34,11 +46,23 @@ async function query(text, params) {
   }
 }
 
+/**
+ * Acquires a client from the pool.
+ *
+ * @returns {Promise<import("pg").PoolClient>}
+ */
 async function getClient() {
   const client = await pool.connect();
   return client;
 }
 
+/**
+ * Runs a callback inside a SQL transaction.
+ *
+ * @template T
+ * @param {(client: import("pg").PoolClient) => Promise<T>} fn
+ * @returns {Promise<T>}
+ */
 async function withTransaction(fn) {
   const client = await getClient();
   try {

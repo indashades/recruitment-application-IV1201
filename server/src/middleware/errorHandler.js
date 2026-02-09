@@ -1,5 +1,14 @@
 const { normalizeError } = require("../errors/normalizeError");
 
+/**
+ * Express error middleware that normalizes errors and returns API-safe payloads.
+ *
+ * @param {unknown} err
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next (Unused, present to satisfy Express error middleware signature)
+ * @returns {void}
+ */
 function errorHandler(err, req, res, next) {
   const requestId = req.requestId;
   const e = normalizeError(err);
