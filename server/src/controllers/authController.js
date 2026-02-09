@@ -3,7 +3,8 @@ const { hashPassword, verifyPassword } = require("../utils/password");
 const { signJwt } = require("../utils/jwt");
 const { eventLog } = require("../utils/eventLog");
 const { AuthError, ConflictError } = require("../errors");
-
+const { assertValid } = require("../validation/assertValid");
+const { registerSchema } = require("../validation/schemas");
 const { userRepository } = require("../repositories/userRepository");
 const { personRepository } = require("../repositories/personRepository");
 
@@ -16,7 +17,8 @@ const { personRepository } = require("../repositories/personRepository");
  * @throws {ConflictError} If username already exists.
  */
 async function register(req, res) {
-  const { username, password, firstName, lastName, email, personnummer } = req.body;
+  const validated = assertValid(registerSchema, req.body);
+  const { username, password, firstName, lastName, email, personnummer } = validated;
 
   const existing = await userRepository.findByUsername(username);
   if (existing) {

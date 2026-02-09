@@ -1,5 +1,7 @@
 const { withTransaction } = require("../utils/database");
 const { eventLog } = require("../utils/eventLog");
+const { assertValid } = require("../validation/assertValid");
+const { submitApplicationSchema, patchStatusSchema } = require("../validation/schemas");
 
 const {
   ValidationError,
@@ -22,7 +24,8 @@ const { availabilityRepository } = require("../repositories/availabilityReposito
  */
 async function submitApplication(req, res) {
   const actor = req.user;
-  const { competences, availability } = req.body;
+  const validated = assertValid(submitApplicationSchema, req.body);
+  const { competences, availability } = validated;
 
   if (!actor || !actor.personId) {
     throw new ValidationError("Authenticated user missing personId", {
@@ -141,7 +144,8 @@ async function getApplicationById(req, res) {
 async function updateApplicationStatus(req, res) {
   const actor = req.user;
   const applicationId = Number(req.params.id);
-  const { status, version } = req.body;
+  const validated = assertValid(patchStatusSchema, req.body);
+  const { status, version } = validated;
 
   const updated = await applicationRepository.updateStatusWithOptimisticLock({
     applicationId,
