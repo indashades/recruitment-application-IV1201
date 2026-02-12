@@ -1,4 +1,4 @@
-export /*default*/ function RegorlogView(props) {
+export function RegorlogView(props) {
     
     function log(){props.log1();}
     function reg(){props.reg1();}

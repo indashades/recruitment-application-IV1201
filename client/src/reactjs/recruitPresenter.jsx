@@ -2,7 +2,7 @@ import { RecruitView } from "../view/RecruitView";
 import { observer } from "mobx-react-lite";
 
 const Recruit = observer(            
-    
+    //view applicants page takes input status {int} and search {string}
     
 
     function RecruitRender(model){

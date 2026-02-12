@@ -1,4 +1,4 @@
-export /*default*/ function ApplyView(props) {
+export function ApplyView(props) {
     
     function log(){props.onChange();}
     function can(){props.onChange2();}
@@ -25,13 +25,7 @@ onChange={props.doUsername}
 
 /></div>
 
-{/*
-<select name="choose competence" id="competence">
-  <option value="">--Please choose an option--</option>
-  <option value="ticket sales">ticket sales</option>
-  <option value="lotteris">lotteries</option>
-  <option value="roller coaster operation">roller coaster operation</option>
-</select>*/}
+
 <div className="wider">
 <input 
 type="text"

@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 
 const Register = observer(            
     
-    //Registering med: first name, last name, person number and email address
+    //Registering med: first name as name1 {string}, last name as name2 {string}, person number as pnr {string} and email address as mail {string}
 
     function RegisterRender(model){
         

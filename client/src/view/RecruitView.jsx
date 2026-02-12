@@ -1,4 +1,4 @@
-export /*default*/ function RecruitView(props) {
+export function RecruitView(props) {
     
     function log(){props.onChange();}
     function searching(){props.onSearch();}
@@ -23,15 +23,15 @@ onChange={props.doPW}
   <option value="4">unhandled</option>
 </select>
 
-{/*test*/}
+{/*test to be removed*/}
 <button onClick={log}>testCreateApplicants</button>
 <button onClick={searching}>search</button>
 
 
 </div>
-{/*here we map them*/}
+
 <div>
-                {/* Map applications here basically copied from old project*/}
+                
                 {props.model.applications.map((app, index) => (
                     <div key={index} style={{ border: "1px solid #ccc", margin: "5px", padding: "5px" }}>
                         <p><strong>ID:</strong> {app.applicationId}</p>

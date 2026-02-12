@@ -1,5 +1,4 @@
 import { login, register, submitApplication } from "./asyncThings";
-/*(person_id, name, surname, pnr, email, password, role_id, username)*/
 
 const model = {  
     
@@ -23,6 +22,9 @@ const model = {
     //functions
     setWantedPage(stringOfSorts){this.wantedPage=stringOfSorts;},
     setToken2(token){this.token=token;},
+    /*testfunction 
+    * @return makes 2 applications in model
+    */
     makeApp()
     {
       this.applications=[
@@ -42,38 +44,40 @@ const model = {
     },
 
 
-    /*
-{
-  "competences": [
-    { "competenceId": 1, "yearsOfExperience": 5.5 }
-  ],
-  "availability": [
-    { "fromDate": "2026-01-01", "toDate": "2026-06-30" }
-  ]
-}
-    */
+    
     //functions that need api
+
+    /*search application
+    * @param name {string} search parameter
+    * @param status {int} status of shown applications
+    * @return makes applications in model
+    */
     async onSearch(name,status)
     {
 
     },
+    /*submit application
+    * @param available from date as fromDate {string}
+    * @param available to date as toDate {string}
+    * years of experience in selling tickets as yearsTicket {number}
+    * years of experience in lotteries as yearsLotteries {number}
+    * years of experience with roller coasters as yearsRoller {number}
+    * @returns nothing it sends the application to database
+    */
     async application(fromDate, toDate, yearsTicket, yearsLotteries, yearsRoller) {
-        // Build competences array
+        
         const competences = [
           { competenceId: 1, yearsOfExperience: yearsTicket },
           { competenceId: 2, yearsOfExperience: yearsLotteries },
           { competenceId: 3, yearsOfExperience: yearsRoller }
         ];
       
-        // Build availability array (backend expects array of {fromDate, toDate})
         const availability = [
           { fromDate, toDate }
         ];
       
-        // Call the async submitApplication function
         const result = await submitApplication(competences, availability);
       
-        // You can store application info or user info if needed
         this.user = {
           
           isAuthenticated: true
@@ -81,6 +85,15 @@ const model = {
         console.log("Application submitted");
       },
       
+    /*register
+    * @param pnr1 {string} person number
+    * @param name1 {string} first name
+    * @param name2 {string} last name
+    * @param mail {string} email
+    * @param pw1 {string} password
+    * @param username1 {string} username
+    * @return loggedin set to 1 and registers user in database
+    */
     async registrering(pnr1,name1,name2,mail,pw1,username1)
     {
         this.pnr=pnr1;
@@ -90,24 +103,28 @@ const model = {
         this.pw=pw1;
         this.username=username1;
 
-        //database magic
         try{
         const result = await register(this.username, this.pw,this.name,this.surname,this.email,this.pnr);
         
             
             
-        //if success
+        
         this.loggedin=1;
         console.log("registrered and logged in as "+this.username);
           }
           catch{alert("registration failed");}//temp ska flyttas men då jag inte kan testa saker så gör jag den här snabbt
 
     },
+    /*sloggaIn
+    * @param username1 {string} username
+    * @param pw1 {string} password
+    * @return sets loggedin to 1 if successful
+    */
     async loggaIn(username1,pw1)
     {
         this.username=username1;
         this.pw=pw1;
-        //database magic
+        
         
         
 
@@ -120,15 +137,10 @@ const model = {
             this.recruiter=1;
           }
         
-        /*test this one has login and username
-        COPY public.person (person_id, name, surname, pnr, email, password, role_id, username) FROM stdin;
-        1    Joelle    Wilkinson    \N    \N    LiZ98qvL8Lw    1    JoelleWilkinson
-        */
 
 
         
 
-        //if success either loggedin or both loggedin and recruiter, there are better ways to do this but this is fine as an initial thing i figure
         this.loggedin=1;
         console.log("logged in as "+this.username);
         }
@@ -136,44 +148,8 @@ const model = {
     }
     
  
-    // more methods will be added here, don't forget to separate them with comma!
 };
 
-/*const model = {  
-    
-    numberOfGuests: 2,
-    dishes: [],
-    currentDishId: null,  // null means "intentionally empty"
-
-    setCurrentDishId(dishId){
-        // this.someProperty= someValue
-        this.currentDishId=dishId;
-    },
-    
-    setNumberOfGuests(number){
-        if(number>0 && Number.isInteger(number)){
-        this.numberOfGuests=number;}
-        if(number<1 || !Number.isInteger(number)){throw new Error("number of guests not a positive integer");}
-    },
-    
-    addToMenu(dishToAdd){
-        // array spread syntax example. Make sure you understand the code below.
-        // It sets this.dishes to a new array [   ] where we spread (...) the elements of the existing this.dishes
-        this.dishes= [...this.dishes, dishToAdd];
-    },
-
-    // filter callback exercise
-    removeFromMenu(dishToRemove){
-        function shouldWeKeepDishCB(dish){
-            return (dishToRemove.id!=dish.id);
-        }
-        this.dishes= this.dishes.filter(shouldWeKeepDishCB);
-    },
-    
- 
-    // more methods will be added here, don't forget to separate them with comma!
-};*/
 
 export {model};
 
-//this is all just a copied model from a prior project for now that i am using as a template to remember model view presenter

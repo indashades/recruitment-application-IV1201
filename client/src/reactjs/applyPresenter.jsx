@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 
 const Apply = observer(            
     /*apply for job with availability as avalablefrom {string} and avalableto {string} 
-    * and years of experience in the different areas as yearsTicket {number}, yearsLotteries {number} and 
+    * and years of experience in the different areas as yearsTicket {number}, yearsLotteries {number} and yearsRoller {number}
     */
     
 
