@@ -21,20 +21,9 @@ const { errorHandler } = require("./middleware/errorHandler");
 const app = express();
 
 /**
- * CORS configuration options.
- *
- * @type {import("cors").CorsOptions}
+ * Enable CORS with no options.
  */
-const corsOptions = {
-  origin: "https://recruitment-application-iv1201-client.onrender.com",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-};
-
-/**
- * Enable CORS with custom options.
- */
-app.use(cors(corsOptions));
+app.use(cors());
 
 /**
  * Parse incoming JSON request bodies.
