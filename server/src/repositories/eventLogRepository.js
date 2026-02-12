@@ -38,7 +38,7 @@ async function insert(client, input) {
   await exec(
     client,
     `
-    INSERT INTO event_log (
+    INSERT INTO public.event_log (
       ts, level, event, request_id,
       actor_user_id, actor_person_id,
       method, path, status, ip, user_agent, payload
@@ -115,7 +115,7 @@ async function list(q = {}) {
         actor_user_id, actor_person_id,
         method, path, status, ip, user_agent,
         payload
-      FROM event_log
+      FROM public.event_log
       ${whereSql}
       ORDER BY ts DESC, id DESC
       LIMIT $${i++} OFFSET $${i++}
