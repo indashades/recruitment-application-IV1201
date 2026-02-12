@@ -18,7 +18,7 @@ const model = {
     applications: [],
     token: null,
     
-    //i have a way to view these done but not yet commited
+    
 
     //functions
     setWantedPage(stringOfSorts){this.wantedPage=stringOfSorts;},
@@ -53,7 +53,10 @@ const model = {
 }
     */
     //functions that need api
-    async onSearch(name,status){},
+    async onSearch(name,status)
+    {
+
+    },
     async application(fromDate, toDate, yearsTicket, yearsLotteries, yearsRoller) {
         // Build competences array
         const competences = [

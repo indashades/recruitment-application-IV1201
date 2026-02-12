@@ -76,3 +76,35 @@ export async function submitApplication(competences, availability) {
   return data;
 }
 
+
+export async function getApplications(sortKey = "submissionDate", direction = "desc") {
+  const query = new URLSearchParams({
+    sortKey,
+    direction
+  }).toString();
+
+  const data = await request(`/applications?${query}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
+}
+/*
+export async function getApplications(search, status) {
+  
+
+  const data = await request("/applications", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ competences, availability })
+  });
+
+  // data contains applicationId, status, submissionDate, version
+  return data;
+}*/
+

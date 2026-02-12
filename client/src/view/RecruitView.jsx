@@ -31,7 +31,7 @@ onChange={props.doPW}
 </div>
 {/*here we map them*/}
 <div>
-                {/* Map applications here */}
+                {/* Map applications here basically copied from old project*/}
                 {props.model.applications.map((app, index) => (
                     <div key={index} style={{ border: "1px solid #ccc", margin: "5px", padding: "5px" }}>
                         <p><strong>ID:</strong> {app.applicationId}</p>
