@@ -61,7 +61,7 @@ function generateLegacySql() {
   console.log(`Generated: ${GENERATED_LEGACY}`);
 }
 
-async function hashRecruiterPasswords() {
+async function syncImportedAccounts() {
   const client = new Client({
     host: DB_HOST,
     port: DB_PORT,
@@ -71,32 +71,76 @@ async function hashRecruiterPasswords() {
   });
   await client.connect();
 
-  const q = await client.query(`
-    SELECT p.person_id, p.username, p.password
-    FROM legacy.person p
-    JOIN legacy.role r ON r.role_id = p.role_id
-    WHERE r.name = 'recruiter'
-      AND p.username IS NOT NULL
-      AND p.password IS NOT NULL
-    ORDER BY p.person_id ASC
-  `);
+  try {
+    const reg = await client.query(`
+      SELECT
+        to_regclass('legacy.person') AS legacy_person,
+        to_regclass('legacy.role') AS legacy_role,
+        to_regclass('public.user_account') AS user_account
+    `);
 
-  console.log("\nRecruiter credentials from legacy dump (for demo):");
-  for (const row of q.rows) {
-    console.log(`  username=${row.username}  password=${row.password}`);
+    const row = reg.rows[0] || {};
+    if (!row.legacy_person || !row.legacy_role || !row.user_account) {
+      console.log("Skipping imported account sync (required tables not present).");
+      return;
+    }
+
+    const q = await client.query(`
+      SELECT
+        p.person_id,
+        p.username,
+        p.password,
+        CASE
+          WHEN LOWER(BTRIM(r.name)) = 'recruiter' THEN 'recruiter'
+          WHEN LOWER(BTRIM(r.name)) = 'applicant' THEN 'applicant'
+          WHEN p.role_id = 1 THEN 'recruiter'
+          WHEN p.role_id = 2 THEN 'applicant'
+          ELSE NULL
+        END AS mapped_role
+      FROM legacy.person p
+      LEFT JOIN legacy.role r ON r.role_id = p.role_id
+      WHERE NULLIF(BTRIM(p.username), '') IS NOT NULL
+      ORDER BY p.person_id ASC
+    `);
+
+    console.log(`\nImported accounts found: ${q.rows.length}`);
+
+    let hashed = 0;
+    let resetRequired = 0;
+
+    for (const r of q.rows) {
+      if (!r.mapped_role) {
+        throw new Error(`Unknown legacy role for person_id=${r.person_id}`);
+      }
+
+      if (r.password && r.password.trim() !== "") {
+        const pwHash = await hashPassword(r.password);
+        await client.query(
+          `UPDATE user_account
+             SET password_hash = $1,
+                 role = $2,
+                 needs_password_reset = FALSE
+           WHERE person_id = $3`,
+          [pwHash, r.mapped_role, r.person_id]
+        );
+        hashed += 1;
+      } else {
+        await client.query(
+          `UPDATE user_account
+             SET password_hash = NULL,
+                 role = $1,
+                 needs_password_reset = TRUE
+           WHERE person_id = $2`,
+          [r.mapped_role, r.person_id]
+        );
+        resetRequired += 1;
+      }
+    }
+
+    console.log(`Imported accounts updated: ${q.rows.length} (hashed=${hashed}, reset_required=${resetRequired})`);
+  } finally {
+    await client.end();
   }
-
-  for (const row of q.rows) {
-    const pwHash = await hashPassword(row.password);
-    await client.query(
-      `UPDATE user_account
-       SET password_hash = $1, needs_password_reset = FALSE
-       WHERE person_id = $2`,
-      [pwHash, row.person_id]
-    );
-  }
-
-  await client.end();
 }
 
 async function main() {
@@ -115,8 +159,8 @@ async function main() {
   console.log("==> Copying legacy data into new schema …");
   run("psql", buildPsqlArgs(DB_NAME, COPY_SQL), { PGPASSWORD: DB_PASSWORD });
 
-  console.log("==> Hashing recruiter passwords into user_account.password_hash …");
-  await hashRecruiterPasswords();
+  console.log("==> Syncing imported accounts (roles + password flags + hashes) …");
+  await syncImportedAccounts();
 
   console.log("\nDB init complete.");
 }

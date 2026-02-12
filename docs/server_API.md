@@ -41,6 +41,8 @@ Common error codes:
 * `BAD_JSON` (HTTP 400) – invalid JSON body
 * `AUTH_REQUIRED` (HTTP 401) – missing token
 * `AUTH_INVALID` (HTTP 401) – invalid credentials, malformed auth header, or invalid/expired token
+* `AUTH_PASSWORD_RESET_REQUIRED` (HTTP 401) – login blocked until account recovery is completed
+* `AUTH_RECOVERY_TOKEN_INVALID` (HTTP 401) – recovery token missing/invalid/expired/already used
 * `FORBIDDEN` (HTTP 403) – wrong role
 * `NOT_FOUND` (HTTP 404)
 * `CONFLICT` (HTTP 409) – conflict (including optimistic lock conflict)
@@ -61,9 +63,9 @@ Body
 ```json
 {
   "username": "username",
-  "password": "password",
-  "firstName": "FName",//guh you use firstName and lastName not FName and LName
-  "lastName": "LName",
+  "password": "password123",
+  "firstName": "firstName",
+  "lastName": "lastName",
   "email": "email@example.com",
   "personnummer": "199001011234"
 }
@@ -114,7 +116,7 @@ Body
 
 ```json
 {
-  "username": "useraname",//useraname??? i assume you just meant username considering that is what it says in the rest of the code
+  "username": "username",
   "password": "password"
 }
 ```
@@ -126,14 +128,82 @@ Success (200)
   "message": "Login successful",
   "data": {
     "token": "JWT_HERE",
-    "role": "applicant"
+    "role": "applicant",
+    "needsPasswordReset": false
   }
 }
 ```
 
+### Request account recovery email
+
+`POST /auth/recovery/request`
+
+Body
+
+```json
+{
+  "identifier": "username-or-email@example.com"
+}
+```
+
+Validation rules:
+
+* `identifier`: string, trimmed, max length `320`
+
+Response is always generic to prevent account enumeration.
+
+Success (200)
+
+```json
+{
+  "message": "If an account exists, a recovery email has been sent",
+  "data": {
+    "accepted": true
+  }
+}
+```
+
+Notes:
+
+* Works for both:
+  * imported accounts without a password ("set password" mode)
+  * classic forgot-password ("reset password" mode)
+* Server sends an email with a one-time tokenized link.
+
+---
+
+### Confirm account recovery
+
+`POST /auth/recovery/confirm`
+
+Body
+
+```json
+{
+  "token": "ONE_TIME_RECOVERY_TOKEN",
+  "newPassword": "newStrongPassword123"
+}
+```
+
+Success (200)
+
+```json
+{
+  "message": "Password updated",
+  "data": {
+    "token": "JWT_HERE",
+    "role": "applicant",
+    "needsPasswordReset": false
+  }
+}
+```
+
+Failure (401):
+* Invalid/expired/already-used token -> `AUTH_RECOVERY_TOKEN_INVALID`
+
 Failure (401)
 
-* Invalid credentials => `AUTH_INVALID`
+* Invalid credentials -> `AUTH_INVALID`
 
 Send token on protected endpoints:
 

@@ -10,7 +10,7 @@ const router = express.Router();
 const { asyncHandler } = require("../utils/asyncHandler");
 const { validate } = require("../middleware/validate");
 const { authenticate } = require("../middleware/auth");
-const { register, login, me } = require("../controllers/authController");
+const { register, login, me, requestRecovery, confirmRecovery } = require("../controllers/authController");
 
 const registerSchema = Joi.object({
   username: Joi.string().trim().min(3).max(50).required(),
@@ -19,6 +19,16 @@ const registerSchema = Joi.object({
   lastName: Joi.string().trim().min(1).max(100).required(),
   email: Joi.string().trim().email().required(),
   personnummer: Joi.string().trim().pattern(/^(\d{6}[-+]\d{4}|\d{8}[-+]\d{4}|\d{10}|\d{12})$/).required(),
+  role: Joi.string().valid("applicant", "recruiter").default("applicant"),
+});
+
+const recoveryRequestSchema = Joi.object({
+  identifier: Joi.string().trim().min(1).max(320).required(),
+});
+
+const recoveryConfirmSchema = Joi.object({
+  token: Joi.string().trim().min(20).max(1024).required(),
+  newPassword: Joi.string().min(8).max(200).required(),
 });
 
 const loginSchema = Joi.object({
@@ -29,5 +39,7 @@ const loginSchema = Joi.object({
 router.post("/register", validate({ body: registerSchema }), asyncHandler(register));
 router.post("/login", validate({ body: loginSchema }), asyncHandler(login));
 router.get("/me", authenticate(), asyncHandler(me));
+router.post("/recovery/request", validate({ body: recoveryRequestSchema }), asyncHandler(requestRecovery));
+router.post("/recovery/confirm", validate({ body: recoveryConfirmSchema }), asyncHandler(confirmRecovery));
 
 module.exports = router;

@@ -31,12 +31,19 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO user_account (person_id, username, password_hash, role, needs_password_reset)
 SELECT
   p.person_id,
-  p.username,
-  NULL,
-  r.name,
-  (p.password IS NULL)
+  NULLIF(BTRIM(p.username), '') AS username,
+  NULL AS password_hash,
+  CASE
+    WHEN LOWER(BTRIM(r.name)) = 'recruiter' THEN 'recruiter'
+    WHEN LOWER(BTRIM(r.name)) = 'applicant' THEN 'applicant'
+    WHEN p.role_id = 1 THEN 'recruiter'
+    WHEN p.role_id = 2 THEN 'applicant'
+    ELSE 'applicant'
+  END AS role,
+  TRUE AS needs_password_reset
 FROM legacy.person p
-JOIN legacy.role r ON r.role_id = p.role_id
+LEFT JOIN legacy.role r ON r.role_id = p.role_id
+WHERE NULLIF(BTRIM(p.username), '') IS NOT NULL
 ON CONFLICT DO NOTHING;
 
 INSERT INTO competence_profile (application_id, competence_id, years_of_experience)

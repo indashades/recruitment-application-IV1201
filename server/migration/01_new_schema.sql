@@ -33,6 +33,28 @@ CREATE TABLE IF NOT EXISTS user_account (
 CREATE UNIQUE INDEX IF NOT EXISTS user_account_username_uq
   ON user_account(username) WHERE username IS NOT NULL;
 
+CREATE TABLE IF NOT EXISTS auth_recovery_token (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL REFERENCES user_account(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL,
+  purpose TEXT NOT NULL CHECK (purpose IN ('set_password','reset_password')),
+  expires_at TIMESTAMPTZ NOT NULL,
+  used_at TIMESTAMPTZ NULL,
+  request_ip TEXT NULL,
+  request_user_agent TEXT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS auth_recovery_token_token_hash_uq
+  ON auth_recovery_token(token_hash);
+
+CREATE INDEX IF NOT EXISTS auth_recovery_token_user_id_idx
+  ON auth_recovery_token(user_id);
+
+CREATE INDEX IF NOT EXISTS auth_recovery_token_active_by_user_idx
+  ON auth_recovery_token(user_id, expires_at DESC)
+  WHERE used_at IS NULL;
+
 CREATE TABLE IF NOT EXISTS application (
   id BIGSERIAL PRIMARY KEY,
   person_id BIGINT NOT NULL REFERENCES person(id) ON DELETE CASCADE,
