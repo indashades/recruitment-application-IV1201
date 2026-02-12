@@ -1,4 +1,4 @@
-export /*default*/ function LoginView(props) {
+export function LoginView(props) {
     
     function log(){props.onChange();}
     

@@ -2,10 +2,12 @@ import { ApplyView } from "../view/ApplyView";
 import { observer } from "mobx-react-lite";
 
 const Apply = observer(            
-    
+    /*apply for job with availability as avalablefrom {string} and avalableto {string} 
+    * and years of experience in the different areas as yearsTicket {number}, yearsLotteries {number} and 
+    */
     
 
-    function ApplyRender(model){//model
+    function ApplyRender(model){
         let avalablefrom=null;
         let avalableto=null;
         let yearsTicket=null;
@@ -18,14 +20,14 @@ const Apply = observer(
         function ura3(p){yearsRoller=p.target.value;}
         async function applybutton() {
                 
-                if (model.model.loggedin===1)//1 for true thing when database works
+                if (model.model.loggedin===1)
                     {
-                        //apply
+                        
                         await model.model.application(avalablefrom,avalableto,yearsTicket,yearsLotteries,yearsRoller);
                     }
                 else
                 {
-                    alert("you are not logged in");//shouldnt be reachable but why not
+                    alert("you are not logged in");
                     window.location.hash = "#/";
                 }
           }
@@ -36,7 +38,7 @@ const Apply = observer(
         
         
 
-        return <ApplyView /* mayhaps the functions? */   onChange={applybutton} onChange2={cancelbutton} doPW={pwa} doUsername={ura} appl1={ura1}
+        return <ApplyView   onChange={applybutton} onChange2={cancelbutton} doPW={pwa} doUsername={ura} appl1={ura1}
          appl2={ura2} appl3={ura3} />;
         
     }
