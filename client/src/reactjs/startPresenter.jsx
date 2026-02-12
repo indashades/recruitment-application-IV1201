@@ -5,7 +5,7 @@ const Start = observer(
     
     
 
-    function StartRender(model){//model
+    function StartRender(model){
         
         function changeRegOrLog() {
                 
@@ -29,7 +29,7 @@ const Start = observer(
         
         
 
-        return <StartView /* mayhaps the functions? */   onChange={changeRegOrLog} welcome viewAppl={viewApplicants} apply={apply}  />;
+        return <StartView   onChange={changeRegOrLog} welcome viewAppl={viewApplicants} apply={apply}  />;
         
     }
 );

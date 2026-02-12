@@ -5,7 +5,7 @@ const Regorlog = observer(
     
     
 
-    function RegorlogRender(model){//model
+    function RegorlogRender(model){
         
         function log1() {
                 
@@ -20,7 +20,7 @@ const Regorlog = observer(
         
         
 
-        return <RegorlogView /* mayhaps the functions? */   log1={log1} welcome reg1={reg1}  />;
+        return <RegorlogView   log1={log1} welcome reg1={reg1}  />;
         
     }
 );

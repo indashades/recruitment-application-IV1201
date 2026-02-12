@@ -1,4 +1,4 @@
-export /*default*/ function StartView(props) {
+export function StartView(props) {
     
     function logreg(){props.onChange();}
     function vi(){props.viewAppl();}
