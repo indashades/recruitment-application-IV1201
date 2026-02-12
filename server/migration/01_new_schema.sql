@@ -75,4 +75,32 @@ CREATE UNIQUE INDEX IF NOT EXISTS availability_uq
 
 CREATE INDEX IF NOT EXISTS availability_application_id_idx ON availability(application_id);
 
+CREATE TABLE IF NOT EXISTS event_log (
+  id BIGSERIAL PRIMARY KEY,
+
+  ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  level TEXT NOT NULL CHECK (level IN ('debug','info','warn','error')) DEFAULT 'info',
+
+  event TEXT NOT NULL,
+
+  request_id TEXT NULL,
+
+  actor_user_id BIGINT NULL REFERENCES user_account(id) ON DELETE SET NULL,
+  actor_person_id BIGINT NULL REFERENCES person(id) ON DELETE SET NULL,
+
+  method TEXT NULL,
+  path TEXT NULL,
+  status INTEGER NULL,
+
+  ip TEXT NULL,
+  user_agent TEXT NULL,
+
+  payload JSONB NULL
+);
+
+CREATE INDEX IF NOT EXISTS event_log_ts_idx ON event_log (ts DESC);
+CREATE INDEX IF NOT EXISTS event_log_event_idx ON event_log (event);
+CREATE INDEX IF NOT EXISTS event_log_request_id_idx ON event_log (request_id);
+CREATE INDEX IF NOT EXISTS event_log_actor_user_id_idx ON event_log (actor_user_id);
+
 COMMIT;
