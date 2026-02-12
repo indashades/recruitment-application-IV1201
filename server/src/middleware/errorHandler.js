@@ -1,14 +1,6 @@
 const { normalizeError } = require("../errors/normalizeError");
+const { eventLog } = require("../utils/eventLog");
 
-/**
- * Express error middleware that normalizes errors and returns API-safe payloads.
- *
- * @param {unknown} err
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @param {import("express").NextFunction} next (Unused, present to satisfy Express error middleware signature)
- * @returns {void}
- */
 function errorHandler(err, req, res, next) {
   const requestId = req.requestId;
   const e = normalizeError(err);
@@ -26,19 +18,26 @@ function errorHandler(err, req, res, next) {
     message: err && err.message,
     stack: err && err.stack,
     details,
-
   };
-  
+
   console.error(logPayload);
 
-  const body = {
-    error: {
+  eventLog(
+    "http_error",
+    {
+      requestId,
       code,
-      message,
+      status,
+      details,
+      errorMessage: err && err.message,
+      stack: err && err.stack,
     },
-  };
+    { req, level: "error", status }
+  );
+
+  const body = { error: { code, message } };
   if (requestId) body.error.requestId = requestId;
-    if (details && status < 500) body.error.details = details;
+  if (details && status < 500) body.error.details = details;
 
   res.status(status).json(body);
 }
