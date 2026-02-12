@@ -1,11 +1,11 @@
-export /*default*/ function RegisterView(props) {
+export function RegisterView(props) {
     
     function regg()
     {
         props.onChange();
-        //saker     
+        
     }
-    {/*Registering med: first name, last name, person number and email address*/}
+    
     
     return (
         <div>

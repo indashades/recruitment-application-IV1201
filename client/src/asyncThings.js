@@ -1,7 +1,11 @@
 
 import { request, setToken, token } from "./api";
 
-
+/*login function
+* @param username {string}
+* @param password {string}
+* @return sets token and returns the role
+*/
 export async function login(username, password) {
   if (!username || !password) {
     console.log("this shouldnt be possible")
@@ -12,7 +16,6 @@ export async function login(username, password) {
     body: JSON.stringify({ username, password })
   });
 
-  // Persist token (model concern)
   setToken(data.token);
   console.log(data.token);
   console.log(data.role);
@@ -21,16 +24,14 @@ export async function login(username, password) {
     role: data.role
   };
 }
-
-/*
-{
-  "username": "username",
-  "password": "password",
-  "firstName": "FName",
-  "lastName": "LName",
-  "email": "email@example.com",
-  "personnummer": "199001011234"
-}
+/*login function
+* @param username {string}
+* @param password {string}
+* @param firstName {string}
+* @param lastName {string}
+* @param email {string}
+* @param personnummer {string}
+* @return returns the role (may not actually set token hence why i chain it with login where it is used )
 */
 export async function register(username, password,firstName,lastName,email,personnummer) {
     if (!username || !password || !firstName || !lastName || ! email || ! personnummer) {
@@ -42,7 +43,6 @@ export async function register(username, password,firstName,lastName,email,perso
       body: JSON.stringify({ username, password,firstName,lastName,email,personnummer })
     });
   
-    // Persist token (model concern)
     setToken(data.token);
     localStorage.setItem("authToken", data.token);
     console.log(data.role);
@@ -52,7 +52,11 @@ export async function register(username, password,firstName,lastName,email,perso
     };
   }
 
-  
+  /*submit application
+  * @param competences {class and array} competences contains competenceId {number} and yearsOfExperience {number} 3 of each
+  * @availability {class} contains fromDate {string} and toDate {string} which detail when applicant is applying for
+  * @return nothing, it sends the application to database 
+  */
 export async function submitApplication(competences, availability) {
   if (!competences || competences.length === 0) {
     alert("shouldnt be possible")
@@ -72,7 +76,21 @@ export async function submitApplication(competences, availability) {
     body: JSON.stringify({ competences, availability })
   });
 
-  // data contains applicationId, status, submissionDate, version
   return data;
 }
 
+
+export async function getApplications(sortKey = "submissionDate", direction = "desc") {
+  const query = new URLSearchParams({
+    sortKey,
+    direction
+  }).toString();
+
+  const data = await request(`/applications?${query}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
+}

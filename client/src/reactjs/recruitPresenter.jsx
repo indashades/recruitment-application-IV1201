@@ -2,19 +2,19 @@ import { RecruitView } from "../view/RecruitView";
 import { observer } from "mobx-react-lite";
 
 const Recruit = observer(            
-    
+    //view applicants page takes input status {int} and search {string}
     
 
-    function RecruitRender(model){//model
+    function RecruitRender(model){
         let status=1;
         let search=null;
         function pwa(p){search=p.target.value;}
         function ura(p){status=p.target.value;}
         async function changeRegOrLog() {
                 model.model.makeApp();
-                if (model.model.loggedin===1)//ändra till 1
+                if (model.model.loggedin===1)
                     {
-                        //do stuff
+                        
                         window.location.hash = "#/";
                         window.location.hash = "#/rec";
                     }
@@ -29,7 +29,7 @@ const Recruit = observer(
         
         
 
-        return <RecruitView /* mayhaps the functions? */   onChange={changeRegOrLog} onSearch={onSearch} doPW={pwa} doUsername={ura} model={model.model}  />;
+        return <RecruitView   onChange={changeRegOrLog} onSearch={onSearch} doPW={pwa} doUsername={ura} model={model.model}  />;
         
     }
 );
