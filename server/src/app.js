@@ -1,11 +1,3 @@
-/**
- * @fileoverview
- * Express application setup.
- *
- * Configures middleware, CORS, routes, and global error handling
- * for API version 1.
- */
-
 const express = require("express");
 const cors = require("cors");
 
@@ -16,42 +8,64 @@ const { errorHandler } = require("./middleware/errorHandler");
 
 /**
  * Express application instance.
- * @type {import("express").Application}
+ * @type {import("express").Express}
  */
 const app = express();
 
 /**
- * Enable CORS with no options.
+ * Fallback CORS allowlist used when `CORS_ORIGINS` is not set.
+ * @type {string[]}
  */
-app.use(cors());
+const defaultAllowedOrigins = [
+  "https://recruitment-application-iv1201-client.onrender.com",
+  "http://localhost:3001",
+];
 
 /**
- * Parse incoming JSON request bodies.
+ * Allowed CORS origins derived from process.env.CORS_ORIGINS or from {@link defaultAllowedOrigins}.
+ *
+ * @type {Set<string>}
  */
+const allowedOrigins = new Set(
+  (process.env.CORS_ORIGINS || defaultAllowedOrigins.join(","))
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean)
+);
+
+app.use(
+  cors({
+    /**
+     * CORS origin validation callback.
+     *
+     * - Allows requests with no Origin header (curl).
+     * - Allows browser requests only if origin is included in allowedOrigins.
+     *
+     * @param {string | undefined} origin - Request Origin header value.
+     * @param {(err: Error | null, allow?: boolean) => void} callback - CORS decision callback.
+     * @returns {void}
+     */
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+
+      return callback(null, allowedOrigins.has(origin));
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-request-id", "x-correlation-id"],
+    exposedHeaders: ["x-request-id"],
+    maxAge: 60 * 60 * 24,
+  })
+);
+
 app.use(express.json());
-
-/**
- * Attach a unique request ID to each request.
- */
 app.use(requestId());
 
-/**
- * API v1 routes.
- */
 app.use("/api/v1", apiV1Routes);
 
-/**
- * Handle 404 (Not Found) errors.
- */
 app.use(notFound);
-
-/**
- * Global error-handling middleware.
- */
 app.use(errorHandler);
 
 /**
- * Export the configured Express app.
- * @module app
+ * Exported Express app for server bootstrap.
  */
 module.exports = { app };
