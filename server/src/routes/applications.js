@@ -47,16 +47,32 @@ const submitSchema = Joi.object({
     .required(),
 });
 
+const allowedStatuses = ["unhandled", "accepted", "rejected"];
+
 const listQuerySchema = Joi.object({
   sortKey: Joi.string().valid("submissionDate", "status", "fullName").default("submissionDate"),
   direction: Joi.string().valid("asc", "desc").default("desc"),
-});
+  status: Joi.string().trim().valid(...allowedStatuses),
+  q: Joi.string().trim().max(200).allow(""),
+  applicationId: Joi.number().integer().positive(),
+  fromDate: Joi.date().iso(),
+  toDate: Joi.date().iso(),
+  limit: Joi.number().integer().min(1).max(500).default(50),
+  offset: Joi.number().integer().min(0).default(0),
+})
+  .custom((value, helpers) => {
+    if (value.fromDate && value.toDate && value.fromDate > value.toDate) {
+      return helpers.error("any.invalid");
+    }
+    return value;
+  }, "fromDate <= toDate")
+  .messages({
+    "any.invalid": "\"fromDate\" must be <= \"toDate\"",
+  });
 
 const idParamsSchema = Joi.object({
   id: Joi.number().integer().positive().required(),
 });
-
-const allowedStatuses = ["unhandled", "accepted", "rejected"];
 
 const patchStatusSchema = Joi.object({
   // Must match DB constraint: CHECK (status IN ('unhandled','accepted','rejected'))
