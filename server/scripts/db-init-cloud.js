@@ -141,16 +141,20 @@ async function syncImportedAccounts() {
           WHEN LOWER(BTRIM(r.name)) = 'applicant' THEN 'applicant'
           WHEN p.role_id = 1 THEN 'recruiter'
           WHEN p.role_id = 2 THEN 'applicant'
-          ELSE NULL
+          ELSE 'applicant'
         END AS mapped_role
       FROM legacy.person p
       LEFT JOIN legacy.role r ON r.role_id = p.role_id
-      WHERE NULLIF(BTRIM(p.username), '') IS NOT NULL
+      WHERE EXISTS (
+        SELECT 1
+        FROM public.user_account ua
+        WHERE ua.person_id = p.person_id
+      )
       ORDER BY p.person_id ASC
     `);
 
     if (q.rows.length === 0) {
-      console.log("No imported account rows with username found.");
+      console.log("No imported account rows found.");
       return;
     }
 
@@ -158,10 +162,6 @@ async function syncImportedAccounts() {
     let resetRequired = 0;
 
     for (const r of q.rows) {
-      if (!r.mapped_role) {
-        throw new Error(`Unknown legacy role for person_id=${r.person_id}`);
-      }
-
       if (r.password && r.password.trim() !== "") {
         const pwHash = await hashPassword(r.password);
         await client.query(

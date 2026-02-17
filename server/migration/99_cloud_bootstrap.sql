@@ -81,6 +81,9 @@ CREATE INDEX IF NOT EXISTS event_log_actor_user_id_idx ON event_log (actor_user_
 CREATE UNIQUE INDEX IF NOT EXISTS user_account_username_uq
   ON user_account(username) WHERE username IS NOT NULL;
 
+CREATE UNIQUE INDEX IF NOT EXISTS user_account_person_id_uq
+  ON user_account(person_id);
+
 CREATE TABLE IF NOT EXISTS application (
   id BIGSERIAL PRIMARY KEY,
   person_id BIGINT NOT NULL REFERENCES person(id) ON DELETE CASCADE,

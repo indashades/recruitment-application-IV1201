@@ -43,8 +43,12 @@ SELECT
   TRUE AS needs_password_reset
 FROM legacy.person p
 LEFT JOIN legacy.role r ON r.role_id = p.role_id
-WHERE NULLIF(BTRIM(p.username), '') IS NOT NULL
-ON CONFLICT DO NOTHING;
+ON CONFLICT (person_id) DO UPDATE
+SET
+  username = COALESCE(EXCLUDED.username, user_account.username),
+  role = EXCLUDED.role,
+  password_hash = NULL,
+  needs_password_reset = TRUE;
 
 INSERT INTO competence_profile (application_id, competence_id, years_of_experience)
 SELECT
