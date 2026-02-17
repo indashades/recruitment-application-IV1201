@@ -81,13 +81,14 @@ async function register(req, res) {
  * @throws {AuthError} If credentials are invalid.
  */
 async function login(req, res) {
-  const { username, password } = req.body;
-  const user = await userRepository.findByUsername(username);
+  const { password } = req.body;
+  const identifier = String(req.body.identifier ?? req.body.username ?? "").trim();
+  const user = await userRepository.findByIdentifier(identifier);
 
   if (!user) {
     eventLog("login_attempt", {
       requestId: req.requestId,
-      username,
+      identifier,
       success: false,
       reason: "NO_USER",
     });
@@ -97,7 +98,7 @@ async function login(req, res) {
   if (user.needs_password_reset) {
     eventLog("login_attempt", {
       requestId: req.requestId,
-      username,
+      identifier,
       success: false,
       reason: "PASSWORD_RESET_REQUIRED",
     });
@@ -110,7 +111,7 @@ async function login(req, res) {
 
   eventLog("login_attempt", {
     requestId: req.requestId,
-    username,
+    identifier,
     success: ok,
   });
 

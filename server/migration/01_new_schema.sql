@@ -33,6 +33,9 @@ CREATE TABLE IF NOT EXISTS user_account (
 CREATE UNIQUE INDEX IF NOT EXISTS user_account_username_uq
   ON user_account(username) WHERE username IS NOT NULL;
 
+CREATE UNIQUE INDEX IF NOT EXISTS user_account_person_id_uq
+  ON user_account(person_id);
+
 CREATE TABLE IF NOT EXISTS auth_recovery_token (
   id BIGSERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES user_account(id) ON DELETE CASCADE,

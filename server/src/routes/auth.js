@@ -32,9 +32,10 @@ const recoveryConfirmSchema = Joi.object({
 });
 
 const loginSchema = Joi.object({
-  username: Joi.string().trim().required(),
+  identifier: Joi.string().trim().min(1),
+  username: Joi.string().trim().min(1), // Backward compatibility only, "identifier" should be used going forward
   password: Joi.string().required(),
-});
+}).or("identifier", "username");
 
 router.post("/register", validate({ body: registerSchema }), asyncHandler(register));
 router.post("/login", validate({ body: loginSchema }), asyncHandler(login));
