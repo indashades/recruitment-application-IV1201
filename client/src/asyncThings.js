@@ -90,7 +90,7 @@ export async function getApplications(status, fullName) {
     fullName
   }).toString();
 
-  const data = await request(`/applications/:${query}`, {
+  const data = await request(`/applications?${query}`, {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`,
@@ -107,7 +107,7 @@ export async function getApplication(id) {
     id
   }).toString();
 
-  const data = await request(`/applications?${query}`, {
+  const data = await request(`/applications/:${query}`, {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`,

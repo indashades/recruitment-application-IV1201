@@ -71,7 +71,10 @@ const model = {
     */
     setss(status,search)
     {
-      this.status=status;
+      if (status==2){this.status="accepted"}
+      else if (status==3){this.status="rejected"}
+      else {this.status="unhandled"}
+      //this.status=status;
       this.search=search;
     },
     async get1Application(id)
