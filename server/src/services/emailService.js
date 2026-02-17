@@ -1,18 +1,39 @@
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 const { getRecoveryTokenTtlMinutes } = require("../utils/recoveryToken");
 
-let resendClient = null;
+let transporter = null;
 
-function getResendClient() {
-  if (resendClient) return resendClient;
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) throw new Error("RESEND_API_KEY is not configured");
-  resendClient = new Resend(apiKey);
-  return resendClient;
+function parseBoolean(value, fallback = false) {
+  if (value === undefined || value === null || value === "") return fallback;
+  return ["1", "true", "yes", "on"].includes(String(value).toLowerCase());
+}
+
+function getTransporter() {
+  if (transporter) return transporter;
+
+  const host = process.env.MAIL_HOST || "smtp.gmail.com";
+  const port = Number(process.env.MAIL_PORT || 587);
+  const secure = parseBoolean(process.env.MAIL_SECURE, port === 465);
+
+  const user = process.env.MAIL_USER;
+  const pass = process.env.MAIL_PASSWORD;
+  if (!user || !pass) {
+    throw new Error("MAIL_USER and MAIL_PASSWORD are not configured");
+  }
+
+  transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+  });
+
+  return transporter;
 }
 
 function getFromAddress() {
-  return process.env.MAIL_FROM || "Recruitment App <onboarding@resend.dev>";
+  const fallbackMailbox = process.env.MAIL_USER || "no-reply@localhost";
+  return process.env.MAIL_FROM || `Recruitment App <${fallbackMailbox}>`;
 }
 
 /**
@@ -22,7 +43,8 @@ function getFromAddress() {
  * @returns {Promise<void>}
  */
 async function sendRecoveryEmail({ to, recoveryLink, mode }) {
-  const client = getResendClient();
+  const smtp = getTransporter();
+
   const ttlMinutes = getRecoveryTokenTtlMinutes();
   const appName = process.env.APP_NAME || "Recruitment Application";
 
@@ -53,14 +75,17 @@ async function sendRecoveryEmail({ to, recoveryLink, mode }) {
     <p>If you did not request this, you can ignore this email.</p>
   `;
 
-  const result = await client.emails.send({
+  const info = await smtp.sendMail({
     from: getFromAddress(),
-    to: [to],
+    to,
     subject,
     text,
     html,
   });
-  if (result && result.error) throw new Error(result.error.message || "Email provider error");
+
+  if (!info || !info.messageId) {
+    throw new Error("Email provider error");
+  }
 }
 
 module.exports = { sendRecoveryEmail };
