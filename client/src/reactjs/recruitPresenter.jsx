@@ -8,20 +8,23 @@ const Recruit = observer(
     function RecruitRender(model){
         let status=1;
         let search=null;
-        function pwa(p){search=p.target.value;}
-        function ura(p){status=p.target.value;}
+        function pwa(p){search=p.target.value;model.model.setss(status,search);}
+        function ura(p){status=p.target.value;model.model.setss(status,search);}
+        function list(a){console.log("entering application with id: "+a);
+            //model.model.get1Application(a);
+        }
         async function changeRegOrLog() {
-                model.model.makeApp();
+                await model.model.makeApp();
+                
                 if (model.model.loggedin===1)
                     {
                         
-                        window.location.hash = "#/";
-                        window.location.hash = "#/rec";
                     }
           }
-          function onSearch(search,status) 
+          async function onSearch(search,status) 
           {
-            model.model.onSearch(search,status);
+            await model.model.onSearch();
+            //model.model.setTrue();
           }
           
           
@@ -29,7 +32,7 @@ const Recruit = observer(
         
         
 
-        return <RecruitView   onChange={changeRegOrLog} onSearch={onSearch} doPW={pwa} doUsername={ura} model={model.model}  />;
+        return <RecruitView   onChange={changeRegOrLog} onSearch={onSearch} p1={pwa} p2={ura} p3={list} model={model.model}  />;
         
     }
 );

@@ -1,6 +1,6 @@
 export function RecruitView(props) {
     
-    function log(){props.onChange();}
+   
     function searching(){props.onSearch();}
     
     return (
@@ -13,10 +13,11 @@ export function RecruitView(props) {
 type="text"
 value={props.search}
 placeholder="search"
-onChange={props.doPW}
+onChange={props.p1}
 
 />
-<select name="choose status" id="status">
+<select name="choose status" id="status"  value={props.status}
+        onChange={props.p2}>
   <option value="1">any</option>
   <option value="2">accepted</option>
   <option value="3">rejected</option>
@@ -24,7 +25,6 @@ onChange={props.doPW}
 </select>
 
 {/*test to be removed*/}
-<button onClick={log}>testCreateApplicants</button>
 <button onClick={searching}>search</button>
 
 
@@ -33,7 +33,9 @@ onChange={props.doPW}
 <div>
                 
                 {props.model.applications.map((app, index) => (
-                    <div key={index} style={{ border: "1px solid #ccc", margin: "5px", padding: "5px" }}>
+                    <div key={index} style={{ border: "1px solid #ccc", margin: "5px", padding: "5px" }}
+                    onClick={() => props.p3(app.applicationId)}
+                    >
                         <p><strong>ID:</strong> {app.applicationId}</p>
                         <p><strong>Name:</strong> {app.fullName}</p>
                         <p><strong>Status:</strong> {app.status}</p>
