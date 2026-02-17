@@ -23,6 +23,8 @@ async function createApplication(client, { personId, status }) {
 /**
  * Returns recruiter list view of applications.
  * 
+ * When q/fullName is provided, prefix matches in name are ranked before non-prefix matches.
+ * 
  * @param {{
  *   sortKey?: "submissionDate"|"status"|"fullName",
  *   direction?: "asc"|"desc",
@@ -78,22 +80,42 @@ async function listForRecruiter({
   }
 
   const search = typeof q === "string" ? q.trim() : "";
+  let relevanceOrderExpr = null;
   if (search) {
+    const containsParamIndex = i;
     where.push(`
       (
-        p.first_name ILIKE $${i}
-        OR p.last_name ILIKE $${i}
-        OR CONCAT_WS(' ', p.first_name, p.last_name) ILIKE $${i}
-        OR p.email ILIKE $${i}
+        p.first_name ILIKE $${containsParamIndex}
+        OR p.last_name ILIKE $${containsParamIndex}
+        OR CONCAT_WS(' ', p.first_name, p.last_name) ILIKE $${containsParamIndex}
+        OR p.email ILIKE $${containsParamIndex}
       )
     `);
     params.push(`%${search}%`);
     i += 1;
+    
+    const prefixParamIndex = i;
+    params.push(`${search}%`);
+    i += 1;
+
+    relevanceOrderExpr = `
+      CASE
+        WHEN p.first_name ILIKE $${prefixParamIndex} THEN 0
+        WHEN p.last_name ILIKE $${prefixParamIndex} THEN 1
+        WHEN CONCAT_WS(' ', p.first_name, p.last_name) ILIKE $${prefixParamIndex} THEN 2
+        ELSE 3
+      END
+    `;
   }
 
   const safeLimit = Number.isFinite(Number(limit)) ? Math.min(Math.max(Number(limit), 1), 500) : 50;
   const safeOffset = Number.isFinite(Number(offset)) ? Math.max(Number(offset), 0) : 0;
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
+  const orderBySql = [
+    relevanceOrderExpr ? `${relevanceOrderExpr} ASC` : null,
+    orderByClause,
+    `a.id ${dir}`,
+  ].filter(Boolean).join(", ");
 
   const r = await exec(
     null,
@@ -107,7 +129,7 @@ async function listForRecruiter({
       FROM application a
       JOIN person p ON p.id = a.person_id
       ${whereSql}
-      ORDER BY ${orderByClause}, a.id ${dir}
+      ORDER BY ${orderBySql}
       LIMIT $${i++} OFFSET $${i++}
     `,
     [...params, safeLimit, safeOffset]
