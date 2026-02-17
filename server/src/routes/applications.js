@@ -54,6 +54,7 @@ const listQuerySchema = Joi.object({
   direction: Joi.string().valid("asc", "desc").default("desc"),
   status: Joi.string().trim().valid(...allowedStatuses),
   q: Joi.string().trim().max(200).allow(""),
+  fullName: Joi.string().trim().max(200).allow(""), // backward-compatible alias for q
   applicationId: Joi.number().integer().positive(),
   fromDate: Joi.date().iso(),
   toDate: Joi.date().iso(),

@@ -73,6 +73,7 @@ async function listApplications(req, res) {
     direction,
     status,
     q,
+    fullName,
     applicationId,
     fromDate,
     toDate,
@@ -80,11 +81,15 @@ async function listApplications(req, res) {
     offset,
   } = req.query;
 
+  const qNormalized = typeof q === "string" ? q.trim() : "";
+  const fullNameNormalized = typeof fullName === "string" ? fullName.trim() : "";
+  const effectiveQ = qNormalized || fullNameNormalized || "";
+
   const rows = await applicationRepository.listForRecruiter({
     sortKey,
     direction,
     status,
-    q,
+    q: effectiveQ,
     applicationId,
     fromDate,
     toDate,
