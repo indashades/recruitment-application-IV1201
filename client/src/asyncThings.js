@@ -79,11 +79,32 @@ export async function submitApplication(competences, availability) {
   return data;
 }
 
-
-export async function getApplications(sortKey = "submissionDate", direction = "desc") {
+/*get applications
+* @param status {string} accepted, rejected or unhandled
+* @param fullName {string} what is actually searched by
+* @returns applications {class} for contains see model 
+*/
+export async function getApplications(status, fullName) {
   const query = new URLSearchParams({
-    sortKey,
-    direction
+    status,
+    fullName
+  }).toString();
+
+  const data = await request(`/applications/:${query}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
+  return data;
+}
+
+//`GET /applications/:id`
+
+export async function getApplication(id) {
+  const query = new URLSearchParams({
+    id
   }).toString();
 
   const data = await request(`/applications?${query}`, {
@@ -93,4 +114,5 @@ export async function getApplications(sortKey = "submissionDate", direction = "d
       "Content-Type": "application/json"
     }
   });
+  return data;
 }

@@ -9,12 +9,15 @@ import { Regorlog } from "./regorlogPresenter";
 import { model } from "../EmploymentModel";
 import { Apply } from "./applyPresenter";
 import { Recruit } from "./recruitPresenter";
+import { observer } from "mobx-react-lite";
+import { Detailed } from "./detailedPresenter";
 
 function makeRouter() {
   return createHashRouter([
     {
       path: "/",
       element: <Start model={model}/>,
+      
     },
     {
       path: "/Reg",
@@ -36,13 +39,34 @@ function makeRouter() {
       path: "/rec",
       element: <Recruit  model={model}/>,
     },
+    {
+      path: "/det",
+      element: <Detailed  model={model}/>,
+    },
   ]);
 }
-
+/*
 function ReactRoot() {
   return <RouterProvider router={makeRouter()} />;
 }
+  */
+const ReactRoot = observer(   //  will be added in week 3
+   
+    
+    
+  function ReactRoot(){
+      
+      if(!model.readym){ return (<div><h1>loading...</h1></div>)}//theFunction searchroot
+          else{/**/ 
+            return <RouterProvider router={makeRouter()} />;
+             /**/
+          }
+                       
+}
+
+)
 
 export { ReactRoot };
+
 
 

@@ -1,4 +1,5 @@
-import { login, register, submitApplication } from "./asyncThings";
+import { getApplications, login, register, submitApplication } from "./asyncThings";
+import { makeAutoObservable } from "mobx";
 
 const model = {  
     
@@ -16,6 +17,10 @@ const model = {
     wantedPage: "#/",
     applications: [],
     token: null,
+    readym: true,
+    status: null,
+    search: null,
+
     
     
 
@@ -54,7 +59,31 @@ const model = {
     */
     async onSearch(name,status)
     {
-
+      this.readym=false;
+      this.applications=await getApplications(this.status,this.search);
+      this.readym=true;
+      
+    },
+    /*
+    * @param status as string but easily changeable to value when we make different languages plausible {string}
+    * @param search full name {string}
+    * @returns edits values used in other function see onSearch
+    */
+    setss(status,search)
+    {
+      this.status=status;
+      this.search=search;
+    },
+    async get1Application(id)
+    {
+      console.log(await this.getApplication(id));
+    },
+    /*
+    * @returns nothing but sets ready to true. This is never actually used
+    */
+    setTrue()
+    {
+      this.readym=true;
     },
     /*submit application
     * @param available from date as fromDate {string}
@@ -150,6 +179,7 @@ const model = {
  
 };
 
+makeAutoObservable(model);
 
 export {model};
 
