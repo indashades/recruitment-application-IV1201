@@ -332,7 +332,7 @@ Notes:
 
 ---
 
-### List applications (Recruiter)
+### List/search applications (Recruiter)
 
 `GET /applications`
 
@@ -341,13 +341,28 @@ Auth
 * Requires token
 * Requires role: `recruiter`
 
-Query params (optional)
+Query params (all optional)
 
 * `sortKey`: `submissionDate` | `status` | `fullName` (default `submissionDate`)
 * `direction`: `asc` | `desc` (default `desc`)
+* `status`: `unhandled` | `accepted` | `rejected`
+* `q`: free-text search string (trimmed, max length `200`); matches person:
+  * `first_name` (contains, case-insensitive)
+  * `last_name` (contains, case-insensitive)
+  * full name (`first_name + ' ' + last_name`, contains, case-insensitive)
+  * `email` (contains, case-insensitive)
+* `applicationId`: positive integer (exact match on application id)
+* `fromDate`: ISO date (`YYYY-MM-DD`), inclusive lower bound on `submissionDate`
+* `toDate`: ISO date (`YYYY-MM-DD`), inclusive upper bound on `submissionDate`
+* `limit`: integer `1..500` (default `50`)
+* `offset`: integer `>= 0` (default `0`)
 
-Example:
-`GET /applications?sortKey=fullName&direction=asc`
+Validation notes:
+
+* `fromDate` and `toDate` must be valid ISO dates when provided.
+* If both are provided, `fromDate <= toDate` is required.
+* Unknown query params are ignored/stripped.
+* Validation failures return `VALIDATION_ERROR` (422) with `error.details.issues`.
 
 Success (200)
 
@@ -363,12 +378,6 @@ Success (200)
     }
   ]
 }
-```
-
-Notes:
-
-* Server currently limits recruiter list to max `50` rows.
-* `sortKey=fullName` is implemented as last-name sort.
 
 ---
 

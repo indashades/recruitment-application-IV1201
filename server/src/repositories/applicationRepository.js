@@ -22,16 +22,78 @@ async function createApplication(client, { personId, status }) {
 
 /**
  * Returns recruiter list view of applications.
- *
- * @param {{sortKey?: "submissionDate"|"status"|"fullName", direction?: "asc"|"desc", limit?: number}} [options]
+ * 
+ * @param {{
+ *   sortKey?: "submissionDate"|"status"|"fullName",
+ *   direction?: "asc"|"desc",
+ *   status?: "unhandled"|"accepted"|"rejected",
+ *   q?: string,
+ *   applicationId?: number,
+ *   fromDate?: string|Date,
+ *   toDate?: string|Date,
+ *   limit?: number,
+ *   offset?: number
+ * }} [options]
  * @returns {Promise<Array<any>>}
  */
-async function listForRecruiter({ sortKey = "submissionDate", direction = "desc", limit = 50 }) {
+async function listForRecruiter({
+  sortKey = "submissionDate",
+  direction = "desc",
+  status,
+  q,
+  applicationId,
+  fromDate,
+  toDate,
+  limit = 50,
+  offset = 0,
+} = {}) {
   const dir = String(direction).toLowerCase() === "asc" ? "ASC" : "DESC";
 
-  let orderBy = "a.submission_date";
-  if (sortKey === "status") orderBy = "a.status";
-  if (sortKey === "fullName") orderBy = "p.last_name";
+  let orderByClause = `a.submission_date ${dir}`;
+  if (sortKey === "status") orderByClause = `a.status ${dir}`;
+  if (sortKey === "fullName") orderByClause = `p.last_name ${dir}, p.first_name ${dir}`;
+
+  const where = [];
+  const params = [];
+  let i = 1;
+
+  if (status) {
+    where.push(`a.status = $${i++}`);
+    params.push(status);
+  }
+
+  if (applicationId) {
+    where.push(`a.id = $${i++}`);
+    params.push(applicationId);
+  }
+
+  if (fromDate) {
+    where.push(`a.submission_date >= $${i++}::date`);
+    params.push(fromDate);
+  }
+
+  if (toDate) {
+    where.push(`a.submission_date <= $${i++}::date`);
+    params.push(toDate);
+  }
+
+  const search = typeof q === "string" ? q.trim() : "";
+  if (search) {
+    where.push(`
+      (
+        p.first_name ILIKE $${i}
+        OR p.last_name ILIKE $${i}
+        OR CONCAT_WS(' ', p.first_name, p.last_name) ILIKE $${i}
+        OR p.email ILIKE $${i}
+      )
+    `);
+    params.push(`%${search}%`);
+    i += 1;
+  }
+
+  const safeLimit = Number.isFinite(Number(limit)) ? Math.min(Math.max(Number(limit), 1), 500) : 50;
+  const safeOffset = Number.isFinite(Number(offset)) ? Math.max(Number(offset), 0) : 0;
+  const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
 
   const r = await exec(
     null,
@@ -44,10 +106,11 @@ async function listForRecruiter({ sortKey = "submissionDate", direction = "desc"
         p.last_name
       FROM application a
       JOIN person p ON p.id = a.person_id
-      ORDER BY ${orderBy} ${dir}
-      LIMIT $1
+      ${whereSql}
+      ORDER BY ${orderByClause}, a.id ${dir}
+      LIMIT $${i++} OFFSET $${i++}
     `,
-    [limit]
+    [...params, safeLimit, safeOffset]
   );
 
   return r.rows;

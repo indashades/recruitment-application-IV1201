@@ -68,11 +68,28 @@ async function submitApplication(req, res) {
  * @returns {Promise<void>} Sends HTTP 200 with recruiter list view.
  */
 async function listApplications(req, res) {
-  const { sortKey, direction } = req.query;
+  const {
+    sortKey,
+    direction,
+    status,
+    q,
+    applicationId,
+    fromDate,
+    toDate,
+    limit,
+    offset,
+  } = req.query;
+
   const rows = await applicationRepository.listForRecruiter({
     sortKey,
     direction,
-    limit: 50,
+    status,
+    q,
+    applicationId,
+    fromDate,
+    toDate,
+    limit,
+    offset,
   });
 
   const data = rows.map((r) => ({
