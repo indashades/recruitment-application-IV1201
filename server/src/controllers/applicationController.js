@@ -10,6 +10,10 @@ const {
 const { applicationRepository } = require("../repositories/applicationRepository");
 const { competenceProfileRepository } = require("../repositories/competenceProfileRepository");
 const { availabilityRepository } = require("../repositories/availabilityRepository");
+const { competenceRepository } = require("../repositories/competenceRepository");
+
+const { validateOrThrow } = require("../validation/validateOrThrow");
+const { submitApplicationSchema } = require("../validation/schemas");
 
 /**
  * Creates a new application for the authenticated applicant.
@@ -22,7 +26,6 @@ const { availabilityRepository } = require("../repositories/availabilityReposito
  */
 async function submitApplication(req, res) {
   const actor = req.user;
-  const { competences, availability } = req.body;
 
   if (!actor || !actor.personId) {
     throw new ValidationError("Authenticated user missing personId", {
@@ -31,6 +34,24 @@ async function submitApplication(req, res) {
   }
 
   const created = await withTransaction(async (client) => {
+    // Pre-insert validation: validate again right before persistence.
+    const safeBody = validateOrThrow(submitApplicationSchema, req.body);
+    const { competences, availability } = safeBody;
+
+    // Verify competenceIds still exist (e.g. competence list changed after client loaded it).
+    const competenceIds = competences.map((c) => c.competenceId);
+    const missing = await competenceRepository.findMissingIds(client, competenceIds);
+    if (missing.length) {
+      throw new ValidationError("Unknown competenceId", {
+        fields: ["competences"],
+        issues: missing.map((id) => ({
+          path: "competences.competenceId",
+          message: `competenceId ${id} does not exist`,
+          type: "any.invalid",
+        })),
+      });
+    }
+
     const appRow = await applicationRepository.createApplication(client, {
       personId: actor.personId,
       status: "unhandled",

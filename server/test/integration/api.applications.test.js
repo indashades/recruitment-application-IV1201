@@ -37,7 +37,17 @@ describe("integration: /api/v1/applications", () => {
 
     const fakeClient = {
       query: jest.fn(async (sql, params) => {
-        if (String(sql).includes("INSERT INTO application")) {
+        const s = String(sql);
+
+        if (s.includes("SELECT id FROM competence") && s.includes("WHERE id = ANY")) {
+
+          const ids = (params && params[0]) || [];
+
+          const rows = ids.includes(1) ? [{ id: 1 }] : [];
+          return { rows, rowCount: rows.length };
+        }
+
+        if (s.includes("INSERT INTO application")) {
           return {
             rows: [{ id: 123, person_id: 10, status: "unhandled", submission_date: "2026-02-18", version: 1 }],
             rowCount: 1,
