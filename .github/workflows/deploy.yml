@@ -14,9 +14,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: |
-          cd server
-          npm ci
-          npm test
+      # --- Server ---
+      - name: Install server deps
+        run: npm ci
+        working-directory: server
 
-      - run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+      - name: Test server
+        run: npm test
+        working-directory: server
+
+      # --- Client ---
+      - name: Install client deps
+        run: npm ci
+        working-directory: client
+
+      # --- Deploy server ---
+      - name: Trigger Render deploy
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+
+      # --- Deploy client ---
+      - name: Trigger Render deploy
+        run: curl -X POST "${{ secrets.RENDER_CLIENT_DEPLOY_HOOK }}"
