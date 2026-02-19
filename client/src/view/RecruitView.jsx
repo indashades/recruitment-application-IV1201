@@ -18,10 +18,10 @@ onChange={props.p1}
 />
 <select name="choose status" id="status"  value={props.status}
         onChange={props.p2}>
-  <option value="1">any</option>
-  <option value="2">accepted</option>
-  <option value="3">rejected</option>
-  <option value="4">unhandled</option>
+  <option value="unhandled">any</option>
+  <option value="accepted">accepted</option>
+  <option value="rejected">rejected</option>
+  <option value="unhandled">unhandled</option>
 </select>
 
 {/*test to be removed*/}
