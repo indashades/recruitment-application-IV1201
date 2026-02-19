@@ -103,16 +103,28 @@ export async function getApplications(status, fullName) {
 //`GET /applications/:id`
 
 export async function getApplication(id) {
-  const query = new URLSearchParams({
-    id
-  }).toString();
+  
 
-  const data = await request(`/applications/:${query}`, {
+  const data = await request(`/applications/${id}`, {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json"
     }
+  });
+  return data;
+}
+
+export async function editAppStatus(id,status,version) {
+  
+//`PATCH /applications/:id/status`
+  const data = await request(`/applications/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ status,version })
   });
   return data;
 }

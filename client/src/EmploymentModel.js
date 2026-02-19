@@ -1,4 +1,4 @@
-import { getApplications, login, register, submitApplication } from "./asyncThings";
+import { getApplications, login, register, submitApplication, getApplication, editAppStatus } from "./asyncThings";
 import { makeAutoObservable } from "mobx";
 
 const model = {  
@@ -16,6 +16,7 @@ const model = {
     recruiter: 0,//auth för recruiter
     wantedPage: "#/",
     applications: [],
+    application: null,
     token: null,
     readym: true,
     status: null,
@@ -59,6 +60,8 @@ const model = {
     */
     async onSearch(name,status)
     {
+      if (this.status==null){this.status="unhandled";}
+      if (this.search==null){this.search="";}
       this.readym=false;
       this.applications=await getApplications(this.status,this.search);
       this.readym=true;
@@ -71,15 +74,25 @@ const model = {
     */
     setss(status,search)
     {
-      if (status==2){this.status="accepted"}
-      else if (status==3){this.status="rejected"}
-      else {this.status="unhandled"}
-      //this.status=status;
+      this.status=status;
+      if(this.status==null){this.status="unhandled"}
       this.search=search;
+      if(this.search==null){this.search="";}
     },
+    setsstat()
+    {
+      //sets status of selected application but empty for now
+    },
+    /*
+    * @param id {int}
+    * @return nothing but gets the application for the model
+    */
     async get1Application(id)
     {
-      console.log(await this.getApplication(id));
+      this.readym=false;
+      this.application=await getApplication(id);
+      console.log(await getApplication(id));
+      this.readym=true;
     },
     /*
     * @returns nothing but sets ready to true. This is never actually used
@@ -146,6 +159,10 @@ const model = {
           }
           catch{alert("registration failed");}//temp ska flyttas men då jag inte kan testa saker så gör jag den här snabbt
 
+    },
+    async changeStatus(status)
+    {
+      await editAppStatus(this.application.applicationId,status,this.application.version)
     },
     /*sloggaIn
     * @param username1 {string} username
