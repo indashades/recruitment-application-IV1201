@@ -25,7 +25,7 @@ jobs:
 
       # --- Client ---
       - name: Install client deps
-        run: npm ci
+        run: npm install
         working-directory: client
 
       # --- Deploy server ---
