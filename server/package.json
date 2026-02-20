@@ -10,7 +10,8 @@
     "db:init": "node scripts/db-init.js",
     "db:reset": "node scripts/db-reset.js",
     "db:init:cloud": "node scripts/db-init-cloud.js",
-    "db:reset:cloud": "node scripts/db-reset-cloud.js"
+    "db:reset:cloud": "node scripts/db-reset-cloud.js",
+    "lint:ci": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "joi": "^17.13.3",
+    "lint": "^0.8.19",
     "nodemailer": "^6.10.1",
     "pg": "^8.17.2"
   },
