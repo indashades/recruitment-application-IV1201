@@ -15,12 +15,16 @@ const Regorlog = observer(
                 
             window.location.hash = "#/Reg";
       }
+      function rec1() {
+                
+        window.location.hash = "#/Rec1";
+  }
           
         
         
         
 
-        return <RegorlogView   log1={log1} welcome reg1={reg1}  />;
+        return <RegorlogView   log1={log1} welcome reg1={reg1} rec1={rec1} />;
         
     }
 );

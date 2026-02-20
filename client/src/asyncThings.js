@@ -128,3 +128,23 @@ export async function editAppStatus(id,status,version) {
   });
   return data;
 }
+
+export async function sendRec1(identifier) {
+  
+  //`PATCH /applications/:id/status`
+    const data = await request(`/auth/recovery/request`, {
+      method: "POST",
+      body: JSON.stringify({ identifier })
+    });
+    return data;
+  }
+
+export async function sendRec2(token,newPassword) {
+  
+  //`PATCH /applications/:id/status`
+    const data = await request(`/auth/recovery/confirm`, {
+      method: "POST",
+      body: JSON.stringify({ token,newPassword })
+    });
+    return data;
+  }

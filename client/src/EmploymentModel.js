@@ -1,4 +1,4 @@
-import { getApplications, login, register, submitApplication, getApplication, editAppStatus } from "./asyncThings";
+import { getApplications, login, register, submitApplication, getApplication, editAppStatus, sendRec1, sendRec2 } from "./asyncThings";
 import { makeAutoObservable } from "mobx";
 
 const model = {  
@@ -79,6 +79,9 @@ const model = {
       this.search=search;
       if(this.search==null){this.search="";}
     },
+    /*
+    * does nothing, just remove
+    */
     setsstat()
     {
       //sets status of selected application but empty for now
@@ -160,10 +163,31 @@ const model = {
           catch{alert("registration failed");}//temp ska flyttas men då jag inte kan testa saker så gör jag den här snabbt
 
     },
+    /*
+    * @param status {string} contains either "unhandled", "accepted" or "rejected"
+    * @return returns nothing but changes the status in database 
+    */
     async changeStatus(status)
     {
       await editAppStatus(this.application.applicationId,status,this.application.version)
     },
+    /*
+    * @param mail or username {string}
+    * @return nothing but requests a password recovery token to be sent to the mail of the account
+    */
+   async rec1(username)
+   {
+    await sendRec1(username);
+   },
+   /*
+   * @param token {string} from mail
+   * @param new password {string}
+   * @return nothing but requests the server update the password
+   */
+  async rec2(token,newPW)
+  {
+    await sendRec2(token,newPW);
+  },
     /*sloggaIn
     * @param username1 {string} username
     * @param pw1 {string} password
