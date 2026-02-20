@@ -11,6 +11,8 @@ import { Apply } from "./applyPresenter";
 import { Recruit } from "./recruitPresenter";
 import { observer } from "mobx-react-lite";
 import { Detailed } from "./detailedPresenter";
+import { Recover } from "./recoverPresenter";
+import { Recover2 } from "./recover2Presenter";
 
 function makeRouter() {
   return createHashRouter([
@@ -42,6 +44,14 @@ function makeRouter() {
     {
       path: "/det",
       element: <Detailed  model={model}/>,
+    },
+    {
+      path: "/rec1",
+      element: <Recover  model={model}/>,
+    },
+    {
+      path: "/rec2",
+      element: <Recover2  model={model}/>,
     },
   ]);
 }

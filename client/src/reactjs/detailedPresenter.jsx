@@ -9,7 +9,7 @@ const Detailed = observer(
         let status=model.model.application.status;
         async function ura(p){status=p.target.value;model.model.setsstat();
             await model.model.changeStatus(status);
-            model.model.setss(0,"");
+            model.model.setss("unhandled","");
             //model.model.setss(status,search)
             await model.model.onSearch();
             window.location.hash = "#/rec";
