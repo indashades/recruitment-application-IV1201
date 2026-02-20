@@ -101,6 +101,10 @@ export async function getApplications(status, fullName) {
 }
 
 //`GET /applications/:id`
+/*
+* @param id {string} id for the requested application
+* @return the entire application
+*/
 
 export async function getApplication(id) {
   
@@ -115,9 +119,16 @@ export async function getApplication(id) {
   return data;
 }
 
+//`PATCH /applications/:id/status`
+/*
+* @param id {string} id of application
+* @param status {string} either accepted, rejected or unhandled
+* @param version {int} the application version
+* @returns nothing really
+*/
 export async function editAppStatus(id,status,version) {
   
-//`PATCH /applications/:id/status`
+
   const data = await request(`/applications/${id}/status`, {
     method: "PATCH",
     headers: {
@@ -129,9 +140,14 @@ export async function editAppStatus(id,status,version) {
   return data;
 }
 
+//`PATCH /applications/:id/status`
+/*
+* @param identifier {string} either username or email
+* @return nothing/that it worked
+*/
 export async function sendRec1(identifier) {
   
-  //`PATCH /applications/:id/status`
+  
     const data = await request(`/auth/recovery/request`, {
       method: "POST",
       body: JSON.stringify({ identifier })
@@ -139,6 +155,11 @@ export async function sendRec1(identifier) {
     return data;
   }
 
+  /*
+  * @param token {string} the token from email
+  * @param newPassword {string} the new password
+  * @return nothing
+  */
 export async function sendRec2(token,newPassword) {
   
   //`PATCH /applications/:id/status`
