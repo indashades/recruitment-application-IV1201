@@ -12,8 +12,8 @@ const model = {
     pw: null,
     role_id: null,
     username: null,
-    loggedin: 0,//auth för applicants
-    recruiter: 0,//auth för recruiter
+    loggedin: 0,
+    recruiter: 0,
     wantedPage: "#/",
     applications: [],
     application: null,
