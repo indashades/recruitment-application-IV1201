@@ -1,34 +1,83 @@
 const nodemailer = require("nodemailer");
 const { getRecoveryTokenTtlMinutes } = require("../utils/recoveryToken");
 
+// Cache (disabled in tests)
 let transporter = null;
+let transporterKey = null;
 
 function parseBoolean(value, fallback = false) {
   if (value === undefined || value === null || value === "") return fallback;
   return ["1", "true", "yes", "on"].includes(String(value).toLowerCase());
 }
 
-function getTransporter() {
-  if (transporter) return transporter;
+function sanitizeUser(v) {
+  return String(v || "").trim();
+}
 
-  const host = process.env.MAIL_HOST || "smtp.gmail.com";
+// Remove newlines and excessive whitespace from passwords to prevent config issues
+function sanitizePass(v) {
+  return String(v || "")
+    .trim()
+    .replace(/\r?\n/g, "")
+    .replace(/\s+/g, "");
+}
+
+function readSmtpConfig() {
+  const host = sanitizeUser(process.env.MAIL_HOST || "smtp.gmail.com");
   const port = Number(process.env.MAIL_PORT || 587);
-  const secure = parseBoolean(process.env.MAIL_SECURE, port === 465);
 
-  const user = process.env.MAIL_USER;
-  const pass = process.env.MAIL_PASSWORD;
+  // Match working method: 587 => STARTTLS (secure=false)
+  const secureDefault = port === 465;
+  const secure = parseBoolean(process.env.MAIL_SECURE, secureDefault);
+
+  const user = sanitizeUser(process.env.MAIL_USER);
+  const pass = sanitizePass(process.env.MAIL_PASSWORD);
+
   if (!user || !pass) {
     throw new Error("MAIL_USER and MAIL_PASSWORD are not configured");
   }
 
-  transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: { user, pass },
+  return { host, port, secure, user, pass };
+}
+
+function buildTransportOptions(cfg) {
+  return {
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure, // false on 587, true on 465
+    auth: { user: cfg.user, pass: cfg.pass },
+
+    // if STARTTLS isn’t available, fail instead of falling back to plaintext.
+    requireTLS: !cfg.secure,
+
+    // Probably useful? Some providers (e.g. Gmail) require this to avoid "cannot connect - handshake timeout" errors.
+    tls: {
+      servername: cfg.host,
+    },
+  };
+}
+
+function getTransporter() {
+  const isTest = process.env.NODE_ENV === "test";
+  const cfg = readSmtpConfig();
+
+  const key = JSON.stringify({
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure,
+    user: cfg.user,
   });
 
-  return transporter;
+  if (!isTest && transporter && transporterKey === key) return transporter;
+
+  const created = nodemailer.createTransport(buildTransportOptions(cfg));
+
+  if (!isTest) {
+    transporter = created;
+    transporterKey = key;
+  }
+
+  return created;
 }
 
 function getFromAddress() {
@@ -44,6 +93,12 @@ function getFromAddress() {
  */
 async function sendRecoveryEmail({ to, recoveryLink, mode }) {
   const smtp = getTransporter();
+
+  // verifies SMTP auth/handshake once per process
+  // Set MAIL_VERIFY=true
+  if (String(process.env.MAIL_VERIFY || "").toLowerCase() === "true") {
+    await smtp.verify();
+  }
 
   const ttlMinutes = getRecoveryTokenTtlMinutes();
   const appName = process.env.APP_NAME || "Recruitment Application";
