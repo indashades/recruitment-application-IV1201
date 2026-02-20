@@ -100,8 +100,8 @@ export async function getApplications(status, fullName) {
   return data;
 }
 
-//`GET /applications/:id`
-/*
+
+/*get application
 * @param id {string} id for the requested application
 * @return the entire application
 */
@@ -119,8 +119,8 @@ export async function getApplication(id) {
   return data;
 }
 
-//`PATCH /applications/:id/status`
-/*
+
+/*edit status
 * @param id {string} id of application
 * @param status {string} either accepted, rejected or unhandled
 * @param version {int} the application version
@@ -140,8 +140,8 @@ export async function editAppStatus(id,status,version) {
   return data;
 }
 
-//`PATCH /applications/:id/status`
-/*
+
+/*recover password 1/2
 * @param identifier {string} either username or email
 * @return nothing/that it worked
 */
@@ -155,14 +155,14 @@ export async function sendRec1(identifier) {
     return data;
   }
 
-  /*
+  /*recover password 2/2
   * @param token {string} the token from email
   * @param newPassword {string} the new password
   * @return nothing
   */
 export async function sendRec2(token,newPassword) {
   
-  //`PATCH /applications/:id/status`
+  
     const data = await request(`/auth/recovery/confirm`, {
       method: "POST",
       body: JSON.stringify({ token,newPassword })
