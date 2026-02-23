@@ -1,23 +1,44 @@
-jest.mock("nodemailer", () => ({
-  createTransport: jest.fn(),
-}));
-
-const nodemailer = require("nodemailer");
 const { sendRecoveryEmail } = require("../../src/services/emailService");
 
-describe("services/emailService", () => {
-  beforeEach(() => {
-    nodemailer.createTransport.mockReset();
-    process.env.MAIL_USER = "smtp-user@test.local";
-    process.env.MAIL_PASSWORD = "smtp-pass";
-    process.env.MAIL_FROM = "Recruitment App <no-reply@test.local>";
-    process.env.RECOVERY_TOKEN_TTL_MINUTES = "30";
-    delete process.env.APP_NAME;
+function makeHeaders(map = {}) {
+  const lowered = Object.fromEntries(
+    Object.entries(map).map(([k, v]) => [String(k).toLowerCase(), v])
+  );
+  return {
+    get(name) {
+      return lowered[String(name).toLowerCase()] ?? null;
+    },
+  };
+}
+
+describe("services/emailService (MailerSend)", () => {
+  let originalFetch;
+
+  beforeAll(() => {
+    originalFetch = global.fetch;
   });
 
-  test("sendRecoveryEmail sends expected mail payload", async () => {
-    const sendMail = jest.fn().mockResolvedValue({ messageId: "abc123" });
-    nodemailer.createTransport.mockReturnValue({ sendMail });
+  afterAll(() => {
+    global.fetch = originalFetch;
+  });
+
+  beforeEach(() => {
+    process.env.MAILERSEND_API_KEY = "ms_test_token";
+    process.env.MAIL_FROM = "Recruitment App <no-reply@example.com>";
+    process.env.MAILERSEND_API_URL = "https://api.mailersend.com/v1/email";
+    process.env.RECOVERY_TOKEN_TTL_MINUTES = "30";
+    delete process.env.APP_NAME;
+    delete process.env.MAILERSEND_REPLY_TO;
+
+    global.fetch = jest.fn();
+  });
+
+  test("sendRecoveryEmail sends expected MailerSend payload", async () => {
+    global.fetch.mockResolvedValue({
+      status: 202,
+      headers: makeHeaders({ "x-message-id": "msg_123" }),
+      text: async () => "",
+    });
 
     await sendRecoveryEmail({
       to: "user@example.com",
@@ -25,19 +46,35 @@ describe("services/emailService", () => {
       mode: "reset_password",
     });
 
-    expect(nodemailer.createTransport).toHaveBeenCalledTimes(1);
-    expect(sendMail).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
 
-    const mail = sendMail.mock.calls[0][0];
-    expect(mail.to).toBe("user@example.com");
-    expect(mail.from).toContain("Recruitment App");
-    expect(mail.subject).toMatch(/reset your password/i);
-    expect(mail.text).toContain("http://localhost:5173/account-recovery?token=xyz");
+    const [url, options] = global.fetch.mock.calls[0];
+    expect(url).toBe("https://api.mailersend.com/v1/email");
+    expect(options.method).toBe("POST");
+    expect(options.headers.Authorization).toBe("Bearer ms_test_token");
+    expect(options.headers["Content-Type"]).toBe("application/json");
+
+    const body = JSON.parse(options.body);
+    expect(body.from.email).toBe("no-reply@example.com");
+    expect(body.from.name).toBe("Recruitment App");
+    expect(body.to).toEqual([{ email: "user@example.com" }]);
+    expect(body.subject).toMatch(/reset your password/i);
+    expect(body.text).toContain("http://localhost:5173/account-recovery?token=xyz");
+    expect(body.html).toContain("Continue account recovery");
   });
 
-  test("throws if provider returns no messageId", async () => {
-    const sendMail = jest.fn().mockResolvedValue({}); // missing messageId
-    nodemailer.createTransport.mockReturnValue({ sendMail });
+  test("throws on MailerSend API validation error", async () => {
+    global.fetch.mockResolvedValue({
+      status: 422,
+      headers: makeHeaders({}),
+      text: async () =>
+        JSON.stringify({
+          message: "The given data was invalid.",
+          errors: {
+            from: ["The domain must be verified."],
+          },
+        }),
+    });
 
     await expect(
       sendRecoveryEmail({
@@ -45,6 +82,22 @@ describe("services/emailService", () => {
         recoveryLink: "http://x",
         mode: "set_password",
       })
-    ).rejects.toThrow(/provider/i);
+    ).rejects.toThrow(/422|verified|invalid/i);
+  });
+
+  test("throws if accepted response has no message id", async () => {
+    global.fetch.mockResolvedValue({
+      status: 202,
+      headers: makeHeaders({}),
+      text: async () => "",
+    });
+
+    await expect(
+      sendRecoveryEmail({
+        to: "user@example.com",
+        recoveryLink: "http://x",
+        mode: "set_password",
+      })
+    ).rejects.toThrow(/message id/i);
   });
 });
