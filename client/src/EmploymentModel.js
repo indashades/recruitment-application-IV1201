@@ -21,6 +21,7 @@ const model = {
     readym: true,
     status: null,
     search: null,
+    mes: null,
 
     
     
@@ -143,7 +144,7 @@ const model = {
     * @return loggedin set to 1 and registers user in database
     */
     async registrering(pnr1,name1,name2,mail,pw1,username1)
-    {
+    { 
         this.pnr=pnr1;
         this.name=name1;
         this.surname=name2;
@@ -169,7 +170,24 @@ const model = {
     */
     async changeStatus(status)
     {
-      await editAppStatus(this.application.applicationId,status,this.application.version)
+      try{
+      this.mes=await editAppStatus(this.application.applicationId,status,this.application.version);
+      console.log(JSON.stringify(this.mes));
+      }
+      catch (err){
+        
+
+          console.log("ERROR FROM BACKEND:", err);
+      
+          if (err.error?.code === "CONFLICT") {
+            alert("Another user updated this application. Please refresh.");
+          } else {
+            alert("Something went wrong.");
+          }
+          this.mes=err;
+        }
+        
+      
     },
     /*
     * @param mail or username {string}
