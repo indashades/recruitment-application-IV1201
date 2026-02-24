@@ -50,7 +50,7 @@ function makeRouter() {
       element: <Recover  model={model}/>,
     },
     {
-      path: "/rec2",
+      path: "/__recover",
       element: <Recover2  model={model}/>,
     },
   ]);

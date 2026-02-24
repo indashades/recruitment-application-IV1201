@@ -5,17 +5,9 @@ export function Recover2View(props) {
     return (
         <div>
     <div>
-    <h1>recover password step 2/2</h1>
+    <h1>Set new password</h1>
     </div>
     <div><input 
-
-type="text"
-value={props.usernameV}
-placeholder="recovery token"
-onChange={props.doUsername}
-
-/>
-<input 
 
 type="password"
 value={props.passwordV}

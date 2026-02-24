@@ -51,9 +51,9 @@ function getAppBaseUrl() {
 }
 
 function buildRecoveryLink(rawToken) {
-  const url = new URL("/account-recovery", `${getAppBaseUrl()}/`);
-  url.searchParams.set("token", rawToken);
-  return url.toString();
+  const base = getAppBaseUrl();
+  const qs = new URLSearchParams({ token: rawToken }).toString();
+  return `${base}/#/__recover?${qs}`;
 }
 
 module.exports = { generateRawRecoveryToken, hashRecoveryToken, getRecoveryTokenTtlMinutes, getRecoveryExpiresAt, buildRecoveryLink };

@@ -9,12 +9,12 @@ const Recover = observer(
         let username=null;
         function ura(p){username=p.target.value;}
         async function changeRegOrLog() {
-            if(username<3){alert("username must contain at least 3 characters");}
+            if(!username || username.length<3){alert("username must contain at least 3 characters");}
             else{
                 try{
                 await model.model.rec1(username)
-                alert("recovery token has been sent to your email")
-                window.location.hash = "#/Rec2";
+                alert("If the account exists, a recovery email has been sent.")
+                window.location.hash = "#/Log";
                 
                 }
                 catch{alert("something went wrong")}
