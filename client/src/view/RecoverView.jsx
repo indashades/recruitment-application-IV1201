@@ -1,3 +1,18 @@
+/**
+ * View component for step 1 of account recovery (request recovery link).
+ *
+ * @param {{
+ *   onChange: () => void,
+ *   doUsername: (event: import("react").ChangeEvent<HTMLInputElement>) => void,
+ *   usernameV?: string,
+ *   loading?: boolean,
+ *   errorMessage?: string,
+ *   successMessage?: string,
+ *   onBack: () => void
+ * }} props
+ * @returns {JSX.Element}
+ */
+
 export function RecoverView(props) {
     
     function log(e){
