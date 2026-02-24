@@ -78,7 +78,7 @@ function readMailerSendConfig() {
     apiKey,
     apiUrl,
     timeoutMs,
-    verifyTls, // kept for future compatibility; fetch uses platform TLS
+    verifyTls,
     from: getFromAddress(),
     replyTo: getReplyToAddress(),
   };

@@ -35,7 +35,7 @@ root/
 * PostgreSQL (`pg`)
 * Joi validation
 * JWT auth (custom HS256 implementation)
-* Nodemailer (password recovery emails)
+* MailerSend Email API (REST) for password recovery emails
 
 ---
 
@@ -85,17 +85,31 @@ APP_BASE_URL=http://localhost:3001
 # ---- Recovery token settings (optional, defaults to 30) ----
 RECOVERY_TOKEN_TTL_MINUTES=30
 
-# ---- Email / SMTP (required for password recovery emails) ----
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_SECURE=false
-MAIL_USER=account@gmail.com
-MAIL_PASSWORD=app-password
-MAIL_FROM=Recruitment App <account@gmail.com>
+# ---- Email / MailerSend (required for password recovery emails) ----
+# Create a MailerSend API key and verify your sending domain first.
+MAILERSEND_API_KEY=ms_xxxxxxxxxxxxxxxxxxxxxxxxx
 
-# Optional
-# MAIL_VERIFY=true
+# Optional (defaults shown)
+# MAILERSEND_API_URL=https://api.mailersend.com/v1/email
+# MAILERSEND_TIMEOUT_MS=10000
+# MAILERSEND_VERIFY_TLS=true
+# MAILERSEND_REPLY_TO=Support <support@example.com>
+
+# Required sender (must be on a verified MailerSend domain)
+MAIL_FROM=Recruitment App <no-reply@registered-domain.com>
+
+# Optional branding
 # APP_NAME=Recruitment Application
+```
+
+### Create the local database (one-time)
+
+Create the database referenced by `DB_NAME` (default: `recruitment_db`) before running `db:init`.
+
+Examples:
+
+```bash
+createdb -U postgres recruitment_db
 ```
 
 ### Install + initialize DB + run server
@@ -182,17 +196,18 @@ If `DATABASE_URL` is set, the server uses it instead of `DB_*`.
 
 ### Email / password recovery
 
-* `MAIL_HOST`
-* `MAIL_PORT`
-* `MAIL_SECURE`
-* `MAIL_USER`
-* `MAIL_PASSWORD`
-* `MAIL_FROM`
+Required for recovery emails:
+
+* `MAILERSEND_API_KEY`
+* `MAIL_FROM` (must use a verified MailerSend domain)
 
 Optional:
 
-* `MAIL_VERIFY=true` (verifies SMTP transport before send)
-* `RECOVERY_TOKEN_TTL_MINUTES` (default 30, clamped to 5..180)
+* `MAILERSEND_API_URL` (default `https://api.mailersend.com/v1/email`)
+* `MAILERSEND_TIMEOUT_MS` (default `10000`, clamped to `1000..60000`)
+* `MAILERSEND_VERIFY_TLS` (default `true`; currently kept for compatibility)
+* `MAILERSEND_REPLY_TO`
+* `RECOVERY_TOKEN_TTL_MINUTES` (default 30, clamped to `5..180`)
 * `APP_NAME` (email subject branding)
 
 ---
@@ -290,7 +305,8 @@ From the local machine (with `psql` installed), run:
 
 ```bash
 cd server
-# Set DATABASE_URL in the shell first (or in server/src/.env, but shell is safer)
+# Set DATABASE_URL in the shell first.
+# Note: db:init:cloud and db:reset:cloud read process.env directly and do NOT load server/src/.env automatically.
 npm install
 npm run db:init:cloud
 ```
@@ -355,6 +371,9 @@ Then run:
 cd server
 npm run db:init:cloud
 ```
+
+> Note: `server/src/.env` is used by the server app and local DB scripts.  
+> The cloud DB scripts (`db:init:cloud`, `db:reset:cloud`) require `DATABASE_URL` to be present in the shell environment unless you manually load dotenv before running them.
 
 ---
 
@@ -439,10 +458,10 @@ Check `CORS_ORIGINS` on the server. It must include your client URL exactly.
 
 Verify:
 
-* `MAIL_USER`
-* `MAIL_PASSWORD` (for Gmail: use an App Password, not the normal password)
-* `MAIL_PORT` / `MAIL_SECURE`
+* `MAILERSEND_API_KEY` is set and valid
+* `MAIL_FROM` uses a MailerSend-verified domain/sender
 * `APP_BASE_URL` points to the frontend URL (so links are correct)
+* your MailerSend account/domain is allowed to send from the configured sender
 
 ### Server boots but `/health` returns degraded
 

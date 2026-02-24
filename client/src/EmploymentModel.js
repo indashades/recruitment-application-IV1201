@@ -186,7 +186,12 @@ const model = {
    */
   async rec2(token,newPW)
   {
-    await sendRec2(token,newPW);
+    const result = await sendRec2(token,newPW);
+    if (result?.token) {
+      this.loggedin=1;
+      this.recruiter=result.role=="recruiter" ? 1 : 0;
+    }
+    return result;
   },
     /*sloggaIn
     * @param username1 {string} username
