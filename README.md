@@ -165,8 +165,6 @@ If the client needs an API base URL, configure it to point to:
 
 ## Environment variables (server) reference
 
-This is the handoff-critical part.
-
 ### Required in most setups
 
 * `JWT_SECRET`
@@ -277,26 +275,20 @@ Set these in Render → Environment:
 
 ```env
 NODE_ENV=production
-PORT=10000                 # Render provides PORT automatically; optional to set manually
+PORT=10000                 # Render provides PORT automatically
 DATABASE_URL=<Neon connection string>
 JWT_SECRET=<strong-random-secret>
 CORS_ORIGINS=https://recruitment-application-iv1201-client.onrender.com,http://localhost:3001
 APP_BASE_URL=https://recruitment-application-iv1201-client.onrender.com
 
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_SECURE=false
-MAIL_USER=<smtp user>
-MAIL_PASSWORD=<smtp app password>
-MAIL_FROM=Recruitment App <your-email@gmail.com>
-```
+# MAILERSEND_API_URL=https://api.mailersend.com/v1/email
+# MAILERSEND_TIMEOUT_MS=10000
+# MAILERSEND_VERIFY_TLS=true
+# MAILERSEND_REPLY_TO=Support <support@example.com>
+MAIL_FROM=Recruitment App <no-reply@your-domain.com>
 
-Optional:
-
-```env
-RECOVERY_TOKEN_TTL_MINUTES=30
-MAIL_VERIFY=true
-APP_NAME=Recruitment Application
+# Optional branding
+# APP_NAME=Recruitment Application
 ```
 
 ### Initialize the production DB (Neon) before first use
