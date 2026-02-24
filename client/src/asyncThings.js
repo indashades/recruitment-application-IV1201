@@ -117,8 +117,8 @@ export async function getApplication(id) {
 
 export async function editAppStatus(id,status,version) {
   
-//`PATCH /applications/:id/status`
-  const data = await request(`/applications/${id}/status`, {
+
+  const message = await request(`/applications/${id}/status`, {
     method: "PATCH",
     headers: {
       "Authorization": `Bearer ${token}`,
@@ -126,7 +126,7 @@ export async function editAppStatus(id,status,version) {
     },
     body: JSON.stringify({ status,version })
   });
-  return data;
+  return message;
 }
 
 export async function sendRec1(identifier) {

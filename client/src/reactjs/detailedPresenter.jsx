@@ -12,6 +12,10 @@ const Detailed = observer(
             model.model.setss("unhandled","");
             //model.model.setss(status,search)
             await model.model.onSearch();
+            if(model.model.mes.message!=undefined)
+            {
+            alert(model.model.mes.message);
+            }
             window.location.hash = "#/rec";
         }
           

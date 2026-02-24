@@ -27,6 +27,7 @@ onChange={props.doUsername}
 
 
 <div className="wider">
+  <h4>experience written as years in ticket sales</h4>
 <input 
 type="text"
 value={props.yearsTicket}
@@ -34,6 +35,7 @@ placeholder="experience written as years in ticket sales"
 onChange={props.appl1}
 /></div>
 <div className="wider">
+  <h4>experience written as years in lotteries work</h4>
 <input 
 type="text"
 value={props.yearsLotteries}
@@ -41,6 +43,7 @@ placeholder="experience written as years in lotteries work"
 onChange={props.appl2}
 /></div>
 <div className="wider">
+  <h4>experience written as years in roller coaster operation</h4>
 <input 
 type="text"
 value={props.yearsRoller}

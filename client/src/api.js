@@ -32,6 +32,9 @@ async function request(path, options = {}) {
       message: "Unknown error",
     };
   }
+  if (!res.ok) {
+    throw json.data; 
+  }
 
   return json.data;
 }
