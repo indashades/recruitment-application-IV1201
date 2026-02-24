@@ -18,6 +18,7 @@ const { exec } = require("./db");
  *   userAgent?: string|null,
  *   payload?: any
  * }} input
+ * @returns {Promise<void>}
  */
 async function insert(client, input) {
   const {
@@ -81,6 +82,21 @@ async function insert(client, input) {
  *   limit?: number,
  *   offset?: number
  * }} q
+ * @returns {Promise<Array<{
+ *   id:number,
+ *   ts:string|Date,
+ *   level:string,
+ *   event:string,
+ *   request_id:string|null,
+ *   actor_user_id:number|null,
+ *   actor_person_id:number|null,
+ *   method:string|null,
+ *   path:string|null,
+ *   status:number|null,
+ *   ip:string|null,
+ *   user_agent:string|null,
+ *   payload:any
+ * }>>}
  */
 async function list(q = {}) {
   const {

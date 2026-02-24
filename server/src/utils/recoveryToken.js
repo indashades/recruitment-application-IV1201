@@ -50,6 +50,12 @@ function getAppBaseUrl() {
   return raw.replace(/\/+$/, "");
 }
 
+/**
+ * Builds the frontend account-recovery URL containing the raw token as a query parameter.
+ *
+ * @param {string} rawToken
+ * @returns {string}
+ */
 function buildRecoveryLink(rawToken) {
   const base = getAppBaseUrl();
   const qs = new URLSearchParams({ token: rawToken }).toString();

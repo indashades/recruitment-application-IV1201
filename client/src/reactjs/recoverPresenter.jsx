@@ -2,8 +2,16 @@ import { RecoverView } from "../view/RecoverView";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 
+/**
+ * Presenter component for step 1 of account recovery.
+ * Collects a username/email identifier, performs basic validation,
+ * triggers the recovery-email request via the app model, and passes UI state to `RecoverView`.
+ *
+ * @param {{ model: { rec1: (identifier: string) => Promise<any> }, [key: string]: any } | { model: { rec1: (identifier: string) => Promise<any> } }} model
+ * @returns {JSX.Element}
+ */
 const Recover = observer(            
-    //login with username {string} and password {string}
+    // Step 1: request a password recovery link using username or email
     
 
     function RecoverRender(model){

@@ -3,8 +3,16 @@ import { observer } from "mobx-react-lite";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+/**
+ * Presenter component for step 2 of account recovery.
+ * Reads the recovery token from the URL, validates the new password,
+ * submits the password reset via the app model, and passes UI state to `Recover2View`.
+ *
+ * @param {{ model: { rec2: (token: string, password: string) => Promise<any> } }} model
+ * @returns {JSX.Element}
+ */
 const Recover2 = observer(            
-    //login with username {string} and password {string}
+    // Step 2: set a new password using the recovery token from the URL
     
 
     function Recover2Render(model){

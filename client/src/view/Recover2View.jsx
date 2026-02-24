@@ -1,3 +1,19 @@
+/**
+ * View component for step 2 of account recovery (set new password from a recovery link).
+ *
+ * @param {{
+ *   onChange: () => void,
+ *   doPW: (event: import("react").ChangeEvent<HTMLInputElement>) => void,
+ *   passwordV?: string,
+ *   hasToken: boolean,
+ *   loading?: boolean,
+ *   errorMessage?: string,
+ *   successMessage?: string,
+ *   onBack: () => void,
+ *   onRequestNewLink: () => void
+ * }} props
+ * @returns {JSX.Element}
+ */
 export function Recover2View(props) {
     
     function log(e){
