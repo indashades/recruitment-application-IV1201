@@ -1,5 +1,13 @@
 const { eventLogRepository } = require("../repositories/eventLogRepository");
 
+/**
+ * Lists event logs using query-string filters and pagination.
+ * Route: GET /api/v1/logs (auth: recruiter).
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>} Sends HTTP 200 with filtered log rows.
+ */
 async function listLogs(req, res) {
   const {
     from,

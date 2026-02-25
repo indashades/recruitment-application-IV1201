@@ -1,32 +1,65 @@
 import { RecoverView } from "../view/RecoverView";
 import { observer } from "mobx-react-lite";
+import { useState } from "react";
 
+/**
+ * Presenter component for step 1 of account recovery.
+ * Collects a username/email identifier, performs basic validation,
+ * triggers the recovery-email request via the app model, and passes UI state to `RecoverView`.
+ *
+ * @param {{ model: { rec1: (identifier: string) => Promise<any> }, [key: string]: any } | { model: { rec1: (identifier: string) => Promise<any> } }} model
+ * @returns {JSX.Element}
+ */
 const Recover = observer(            
-    //login with username {string} and password {string}
+    // Step 1: request a password recovery link using username or email
     
 
     function RecoverRender(model){
-        let username=null;
-        function ura(p){username=p.target.value;}
+        const [username, setUsername] = useState("");
+        const [loading, setLoading] = useState(false);
+        const [errorMessage, setErrorMessage] = useState("");
+        const [successMessage, setSuccessMessage] = useState("");
+
+        function ura(p){
+            setUsername(p.target.value);
+            if (errorMessage) setErrorMessage("");
+        }
+
+        function goBack() {
+            window.location.hash = "#/Log";
+        }
         async function changeRegOrLog() {
-            if(username<3){alert("username must contain at least 3 characters");}
+            const identifier = (username || "").trim();
+            if(identifier.length < 3){
+                setErrorMessage("Enter at least 3 characters (username or email).");
+                setSuccessMessage("");
+            }
             else{
                 try{
-                await model.model.rec1(username)
-                alert("recovery token has been sent to your email")
-                window.location.hash = "#/Rec2";
-                
+                    setLoading(true);
+                    setErrorMessage("");
+                    await model.model.rec1(identifier);
+                    setSuccessMessage("If the account exists, a recovery email has been sent. Please check your inbox and spam folder.");
                 }
-                catch{alert("something went wrong")}
+                catch{
+                    setSuccessMessage("");
+                    setErrorMessage("We couldn't send the recovery email right now. Please try again.");
+                }
+                finally{
+                    setLoading(false);
+                }
             }
           }
           
-          
-        
-        
-        
-
-        return <RecoverView   onChange={changeRegOrLog} doUsername={ura}  />;
+        return <RecoverView
+          onChange={changeRegOrLog}
+          doUsername={ura}
+          usernameV={username}
+          loading={loading}
+          errorMessage={errorMessage}
+          successMessage={successMessage}
+          onBack={goBack}
+        />;
         
     }
 );

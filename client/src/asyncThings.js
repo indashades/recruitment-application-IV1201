@@ -137,7 +137,7 @@ export async function editAppStatus(id,status,version) {
     },
     body: JSON.stringify({ status,version })
   });
-  return data;
+  return message;
 }
 
 
@@ -167,5 +167,9 @@ export async function sendRec2(token,newPassword) {
       method: "POST",
       body: JSON.stringify({ token,newPassword })
     });
+    if (data?.token) {
+      setToken(data.token);
+      localStorage.setItem("authToken", data.token);
+    }
     return data;
   }

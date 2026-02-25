@@ -1,6 +1,16 @@
 const { normalizeError } = require("../errors/normalizeError");
 const { eventLog } = require("../utils/eventLog");
 
+/**
+ * Express error-handling middleware that normalizes unknown errors,
+ * logs them, and returns a standardized JSON error response.
+ *
+ * @param {unknown} err
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ * @returns {void}
+ */
 function errorHandler(err, req, res, next) {
   const requestId = req.requestId;
   const e = normalizeError(err);
