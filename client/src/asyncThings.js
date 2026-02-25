@@ -129,7 +129,7 @@ export async function getApplication(id) {
 export async function editAppStatus(id,status,version) {
   
 
-  const data = await request(`/applications/${id}/status`, {
+  const message = await request(`/applications/${id}/status`, {
     method: "PATCH",
     headers: {
       "Authorization": `Bearer ${token}`,
