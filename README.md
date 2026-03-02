@@ -2,76 +2,179 @@
 
 Full-stack recruitment application with:
 
-- Client (frontend)
-- Server (Node.js / Express REST API)
-- PostgreSQL database (local Postgres or Neon.tech)
-- Deployments on Render.com (client + server)
-
-## Live deployments
-
-- API (Render): https://recruitment-application-iv1201.onrender.com
-- Client (Render): https://recruitment-application-iv1201-client.onrender.com
-
-> Note: Render free instances may sleep after inactivity. First request can take a while.
-> Avoid spamming requests while the server wakes up.
-
----
+- a React client in `client/`
+- a Node.js / Express REST API in `server/`
+- a PostgreSQL database
+- support for local PostgreSQL and hosted PostgreSQL via `DATABASE_URL`
+- password recovery by email using MailerSend
 
 ## Project structure
 
 ```text
 root/
-  client/                # Frontend app
-  server/                # Express API + DB scripts + migrations
-  docs/server_api.md     # API reference (v1)
-````
+  client/   # React frontend
+  server/   # Express API, database scripts, migrations, tests
+```
+
+## Live deployments
+
+- API: `https://recruitment-application-iv1201.onrender.com`
+- Client: `https://recruitment-application-iv1201-client.onrender.com`
+
+> Render free instances may sleep after inactivity, so the first request can be slow.
 
 ---
 
-## Tech stack (server)
+# Client
 
-* Node.js (CI uses Node 20)
-* Express 5
-* PostgreSQL (`pg`)
-* Joi validation
-* JWT auth (custom HS256 implementation)
-* MailerSend Email API (REST) for password recovery emails
+## Overview
 
----
+The client is a Create React App frontend that uses:
 
-## Quick start (local development)
+- React
+- React Router
+- MobX
 
-## Prerequisites
+The app uses **hash routing** (`#/...`), for example:
+
+- `#/`
+- `#/Log`
+- `#/Reg`
+- `#/Appl`
+- `#/rec`
+- `#/rec1`
+- `#/__recover?token=...`
+
+API requests are sent to the backend using:
+
+- `REACT_APP_API_BASE_URL`
+
+If that variable is not set, the client defaults to the deployed Render API:
+
+- `https://recruitment-application-iv1201.onrender.com/api/v1`
+
+## Client prerequisites
 
 Install:
 
-* Node.js 20+
-* npm
-* PostgreSQL (local)
-* psql CLI (required by the DB init/reset scripts)
+- Node.js 20+
+- npm
 
-> The DB scripts use `psql` directly (`db:init`, `db:reset`), so having Postgres installed without the CLI is not enough.
+## Client environment variables
 
----
-
-## 1) Server setup (local)
-
-### Create env file
-
-Create `server/src/.env` (or copy from a safe template if you add one later).
+Create `client/.env`.
 
 Example:
 
 ```env
-# ---- Database (local Postgres) ----
+PORT=3001
+REACT_APP_API_BASE_URL=http://localhost:3000/api/v1
+```
+
+### Notes
+
+- `PORT=3001` makes CRA run on `http://localhost:3001`
+- `REACT_APP_API_BASE_URL` points the client to the local backend
+- if `REACT_APP_API_BASE_URL` is omitted, the client talks to the deployed API on Render
+
+## Run the client locally
+
+```bash
+cd client
+npm install
+npm start
+```
+
+The client will run on:
+
+- `http://localhost:3001`
+
+## Build the client
+
+```bash
+cd client
+npm run build
+```
+
+Production files are written to:
+
+- `client/build/`
+
+## Test the client
+
+```bash
+cd client
+npm test
+```
+
+## Client deployment notes
+
+The client is suitable for static hosting.
+
+Because it uses **hash routing**, deep-link rewrite rules are usually not required in the same way as browser-history routing.
+
+A typical static deployment uses:
+
+- Root Directory: `client`
+- Build Command: `npm install && npm run build`
+- Publish Directory: `build`
+
+For hosted builds, set:
+
+```env
+REACT_APP_API_BASE_URL=https://recruitment-application-iv1201.onrender.com/api/v1
+```
+
+---
+
+# Server
+
+## Overview
+
+The server is an Express 5 API with:
+
+- PostgreSQL via `pg`
+- Joi request validation
+- JWT-based authentication
+- role-based authorization (`applicant` / `recruiter`)
+- MailerSend-based password recovery
+- structured event logging stored in the database
+
+Base API path:
+
+- `/api/v1`
+
+## Server prerequisites
+
+Install:
+
+- Node.js 20+
+- npm
+- PostgreSQL
+- `psql` CLI
+
+> The database init/reset scripts call `psql` directly. PostgreSQL must be installed with command-line tools available on your `PATH`.
+
+## Server environment variables
+
+The server loads environment variables from:
+
+- `server/src/.env`
+
+Create that file before running the API locally.
+
+Example:
+
+```env
+# ---- Database: local mode ----
 DB_USER=postgres
 DB_PASSWORD=postgres
 DB_NAME=recruitment_db
 DB_HOST=localhost
 DB_PORT=5432
 
-# Optional: if set, server will use this instead of DB_* values
-# DATABASE_URL=postgresql://user:password@host:5432/dbname
+# Optional: hosted database mode
+# DATABASE_URL=postgresql://user:password@host:5432/dbname?sslmode=require
 
 # ---- Auth ----
 JWT_SECRET=change-this-in-production
@@ -79,386 +182,395 @@ JWT_SECRET=change-this-in-production
 # ---- CORS ----
 CORS_ORIGINS=http://localhost:3001,https://recruitment-application-iv1201-client.onrender.com
 
-# ---- Frontend URL (used in recovery email links) ----
+# ---- Frontend URL used for recovery links ----
 APP_BASE_URL=http://localhost:3001
 
-# ---- Recovery token settings (optional, defaults to 30) ----
+# ---- Recovery tokens ----
 RECOVERY_TOKEN_TTL_MINUTES=30
 
-# ---- Email / MailerSend (required for password recovery emails) ----
-# Create a MailerSend API key and verify your sending domain first.
+# ---- MailerSend ----
 MAILERSEND_API_KEY=ms_xxxxxxxxxxxxxxxxxxxxxxxxx
+MAIL_FROM=Recruitment App <no-reply@your-domain.com>
 
-# Optional (defaults shown)
+# Optional MailerSend settings
 # MAILERSEND_API_URL=https://api.mailersend.com/v1/email
 # MAILERSEND_TIMEOUT_MS=10000
 # MAILERSEND_VERIFY_TLS=true
 # MAILERSEND_REPLY_TO=Support <support@example.com>
 
-# Required sender (must be on a verified MailerSend domain)
-MAIL_FROM=Recruitment App <no-reply@registered-domain.com>
-
-# Optional branding
+# Optional email branding
 # APP_NAME=Recruitment Application
 ```
 
-### Create the local database (one-time)
+## Server environment reference
 
-Create the database referenced by `DB_NAME` (default: `recruitment_db`) before running `db:init`.
+### Authentication
 
-Examples:
+- `JWT_SECRET`  
+  Secret used to sign and verify JWTs.
+
+### Database
+
+Use one of these modes:
+
+#### Local PostgreSQL
+
+- `DB_USER`
+- `DB_PASSWORD`
+- `DB_NAME`
+- `DB_HOST`
+- `DB_PORT`
+
+#### Hosted PostgreSQL
+
+- `DATABASE_URL`
+
+If `DATABASE_URL` is set, the server uses it instead of `DB_*`.
+
+### CORS and frontend URL
+
+- `CORS_ORIGINS`  
+  Comma-separated list of allowed browser origins.
+- `APP_BASE_URL`  
+  Used when generating password recovery links.
+- `FRONTEND_URL` and `CLIENT_URL` are also supported as fallbacks in code.
+
+### Recovery token settings
+
+- `RECOVERY_TOKEN_TTL_MINUTES`  
+  Default: `30`  
+  Allowed range in code: `5..180`
+
+### MailerSend
+
+Required for password recovery email delivery:
+
+- `MAILERSEND_API_KEY`
+- `MAIL_FROM`
+
+Optional:
+
+- `MAILERSEND_API_URL`
+- `MAILERSEND_TIMEOUT_MS`
+- `MAILERSEND_VERIFY_TLS`
+- `MAILERSEND_REPLY_TO`
+- `APP_NAME`
+
+## Run the server locally
+
+```bash
+cd server
+npm install
+npm run dev
+```
+
+The server runs on:
+
+- `http://localhost:3000`
+
+API base URL:
+
+- `http://localhost:3000/api/v1`
+
+## Local database setup
+
+### 1. Create the database
+
+Create the database referenced by `DB_NAME` before running the init script.
+
+Example:
 
 ```bash
 createdb -U postgres recruitment_db
 ```
 
-### Install + initialize DB + run server
+### 2. Initialize the database
 
 ```bash
 cd server
 npm install
 npm run db:init
-npm run dev
 ```
 
-Server runs on:
+This flow:
 
-* `http://localhost:3000`
-* API base: `http://localhost:3000/api/v1`
+1. loads the legacy SQL dump into `legacy.*`
+2. creates the new schema in `public.*`
+3. copies legacy data into the new schema
+4. syncs imported user accounts, roles, password hashes, and password-reset flags
 
-### Reset local DB (rebuild from migration scripts)
+### 3. Reset the local database
 
 ```bash
 cd server
 npm run db:reset
 ```
 
-This drops app tables + legacy schema and rebuilds from the migration flow.
+This drops app tables and the `legacy` schema, then rebuilds from the migration flow.
 
----
+> Warning: this is destructive.
 
-## 2) Client setup (local)
+## Hosted PostgreSQL / cloud database setup
 
-```bash
-cd client
-npm install
-npm start
-```
+The server also supports hosted PostgreSQL using `DATABASE_URL`.
 
-The client is expected to run on:
+### Initialize a cloud database
 
-* `http://localhost:3001`
-
-> The server CORS default allowlist already includes `http://localhost:3001`.
-
-### Client environment variables
-
-The exact client env variable names depend on the frontend implementation (not documented here yet).
-If the client needs an API base URL, configure it to point to:
-
-* Local API: `http://localhost:3000/api/v1`
-* Render API: `https://recruitment-application-iv1201.onrender.com/api/v1`
-
-> TODO for maintainers: add `client/.env.example` with the exact variable names used by the frontend.
-
----
-
-## Environment variables (server) reference
-
-### Required in most setups
-
-* `JWT_SECRET`
-  Secret used to sign/verify JWTs. Must be strong in production.
-
-### Database (choose one mode)
-
-#### Option A: Local Postgres (`DB_*`)
-
-* `DB_USER`
-* `DB_PASSWORD`
-* `DB_NAME`
-* `DB_HOST`
-* `DB_PORT`
-
-#### Option B: Hosted Postgres (`DATABASE_URL`)
-
-* `DATABASE_URL`
-
-If `DATABASE_URL` is set, the server uses it instead of `DB_*`.
-
-### CORS / frontend link generation
-
-* `CORS_ORIGINS` (comma-separated list)
-* `APP_BASE_URL` (used for password recovery links)
-* Also supported as alternatives in code: `FRONTEND_URL`, `CLIENT_URL`
-
-### Email / password recovery
-
-Required for recovery emails:
-
-* `MAILERSEND_API_KEY`
-* `MAIL_FROM` (must use a verified MailerSend domain)
-
-Optional:
-
-* `MAILERSEND_API_URL` (default `https://api.mailersend.com/v1/email`)
-* `MAILERSEND_TIMEOUT_MS` (default `10000`, clamped to `1000..60000`)
-* `MAILERSEND_VERIFY_TLS` (default `true`; currently kept for compatibility)
-* `MAILERSEND_REPLY_TO`
-* `RECOVERY_TOKEN_TTL_MINUTES` (default 30, clamped to `5..180`)
-* `APP_NAME` (email subject branding)
-
----
-
-## Database initialization flows
-
-The server includes two different DB flows:
-
-### Local Postgres (development)
-
-Uses:
-
-* `npm run db:init`
-* `npm run db:reset`
-
-This flow:
-
-1. Loads legacy dump into `legacy.*`
-2. Creates new schema in `public.*`
-3. Copies/migrates legacy data into new schema
-4. Syncs imported account roles/password states
-
-### Cloud Postgres / Neon (hosted)
-
-Uses:
-
-* `npm run db:init:cloud`
-* `npm run db:reset:cloud`
-
-This flow is adapted for Neon/Postgres hosting and:
-
-* uses `DATABASE_URL`
-* enforces SSL
-* strips SQL statements Neon won’t accept (ownership/role/grants etc.)
-
-> Important: The cloud scripts also require `psql` installed on the machine where you run them.
-
----
-
-## Render.com deployment guide (server + client)
-
-This repo appears to deploy both apps on Render, with deploy hooks triggered by GitHub Actions.
-
-### Recommended architecture
-
-* Render Web Service → `server/`
-* Render Static Site (or Web Service) → `client/`
-* Neon.tech PostgreSQL → production DB
-
----
-
-## Server on Render (Web Service)
-
-Create a new Web Service from this repo.
-
-### Settings
-
-* Root Directory: `server`
-* Build Command: `npm install`
-* Start Command: `npm start`
-* Runtime: Node
-* Node version: 20 (recommended to match CI)
-
-### Required environment variables on Render (server)
-
-Set these in Render → Environment:
-
-```env
-NODE_ENV=production
-PORT=10000                 # Render provides PORT automatically
-DATABASE_URL=<Neon connection string>
-JWT_SECRET=<strong-random-secret>
-CORS_ORIGINS=https://recruitment-application-iv1201-client.onrender.com,http://localhost:3001
-APP_BASE_URL=https://recruitment-application-iv1201-client.onrender.com
-
-# MAILERSEND_API_URL=https://api.mailersend.com/v1/email
-# MAILERSEND_TIMEOUT_MS=10000
-# MAILERSEND_VERIFY_TLS=true
-# MAILERSEND_REPLY_TO=Support <support@example.com>
-MAIL_FROM=Recruitment App <no-reply@your-domain.com>
-
-# Optional branding
-# APP_NAME=Recruitment Application
-```
-
-### Initialize the production DB (Neon) before first use
-
-From the local machine (with `psql` installed), run:
+Set `DATABASE_URL` in your shell, then run:
 
 ```bash
 cd server
-# Set DATABASE_URL in the shell first.
-# Note: db:init:cloud and db:reset:cloud read process.env directly and do NOT load server/src/.env automatically.
 npm install
 npm run db:init:cloud
 ```
 
-If you need a full rebuild/reset:
+### Reset a cloud database
 
 ```bash
+cd server
 npm run db:reset:cloud
 ```
 
-> Warning: `db:reset:cloud` drops app tables / schemas and rebuilds the database. Do not run this on production unless intended.
+### Cloud script notes
 
----
+- `db:init:cloud` and `db:reset:cloud` read `DATABASE_URL` from the shell environment
+- those scripts do **not** automatically load `server/src/.env`
+- they still require `psql`
+- the cloud flow enforces SSL and strips SQL statements that hosted providers like Neon may reject
 
-## Client on Render
+> Warning: `db:reset:cloud` is destructive.
 
-Depending on how the frontend is configured, use either:
+## API routes
 
-* Static Site (common for React build output)
-* or Web Service (if using a custom server)
+Base path:
 
-### Typical Static Site setup
+- `/api/v1`
 
-* Root Directory: `client`
-* Build Command: `npm install && npm run build`
-* Publish Directory: `build`
+### Health
 
-### Client env vars (Render)
+- `GET /health`
 
-Set the frontend API base URL to your Render API service (exact variable name depends on client code).
+Returns:
 
-Use:
+- `200` with `status: "ok"` when the database is reachable
+- `503` with `status: "degraded"` when the API is up but the database is unavailable
 
-* `https://recruitment-application-iv1201.onrender.com/api/v1`
+### Authentication
 
-> TODO for maintainers: document the exact client env variable names in `client/README.md` or `client/.env.example`.
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /auth/me`
+- `POST /auth/recovery/request`
+- `POST /auth/recovery/confirm`
 
----
+### Applications
 
-## Neon.tech setup guide (database)
+- `POST /applications`  
+  Auth required, applicant only
+- `GET /applications`  
+  Auth required, recruiter only
+- `GET /applications/:id`  
+  Auth required, recruiter only
+- `PATCH /applications/:id/status`  
+  Auth required, recruiter only
 
-1. Create a project/database in Neon
-2. Copy the connection string (`postgresql://...`)
-3. Use it as `DATABASE_URL` in:
+### Competences
 
-   * Render server environment variables
-   * local terminal when running `db:init:cloud` / `db:reset:cloud`
+- `GET /competences`
 
-### Example
+### Logs
 
-```bash
-# macOS/Linux
-export DATABASE_URL='postgresql://user:pass@host/db?sslmode=require'
+- `GET /logs`  
+  Auth required, recruiter only
 
-# Windows PowerShell
-$env:DATABASE_URL='postgresql://user:pass@host/db?sslmode=require'
+## Authentication model
+
+The API uses Bearer tokens.
+
+Send:
+
+```http
+Authorization: Bearer <jwt>
 ```
 
-Then run:
+Roles enforced in middleware:
 
-```bash
-cd server
-npm run db:init:cloud
+- `applicant`
+- `recruiter`
+
+## Password recovery flow
+
+The recovery flow works like this:
+
+1. the client calls `POST /api/v1/auth/recovery/request`
+2. the server creates a one-time recovery token
+3. the server builds a frontend link using `APP_BASE_URL`
+4. MailerSend sends the recovery email
+5. the user opens the frontend recovery page
+6. the client calls `POST /api/v1/auth/recovery/confirm`
+
+The generated recovery URL format is:
+
+```text
+<APP_BASE_URL>/#/__recover?token=<token>
 ```
 
-> Note: `server/src/.env` is used by the server app and local DB scripts.  
-> The cloud DB scripts (`db:init:cloud`, `db:reset:cloud`) require `DATABASE_URL` to be present in the shell environment unless you manually load dotenv before running them.
+Example local value:
 
----
+```text
+http://localhost:3001/#/__recover?token=...
+```
 
-## API documentation
+If `APP_BASE_URL` is wrong or missing, recovery links will point to the wrong frontend.
 
-Detailed API docs live at:
+## Server scripts
 
-* `docs/server_api.md`
+From `server/package.json`:
 
-Base URLs:
+- `npm test` — run Jest tests
+- `npm start` — run the API with Node
+- `npm run dev` — run the API with nodemon
+- `npm run db:init` — initialize local database
+- `npm run db:reset` — reset local database
+- `npm run db:init:cloud` — initialize cloud database
+- `npm run db:reset:cloud` — reset cloud database
+- `npm run lint:ci` — run ESLint
 
-* Local: `http://localhost:3000/api/v1`
-* Render: `https://recruitment-application-iv1201.onrender.com/api/v1`
-
-Health check:
-
-* `GET /api/v1/health`
-
----
-
-## Common developer workflows
-
-### Run server tests
+## Test the server
 
 ```bash
 cd server
 npm test
 ```
 
-### Lint server
+## Lint the server
 
 ```bash
 cd server
 npm run lint:ci
 ```
 
-### Run both apps locally (two terminals)
+## Deployment notes
 
-```bash
-# Terminal 1
-cd server
-npm run dev
+### Server
 
-# Terminal 2
-cd client
-npm start
+Typical hosted server settings:
+
+- Root Directory: `server`
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Runtime: Node 20
+
+Typical required production environment variables:
+
+```env
+NODE_ENV=production
+DATABASE_URL=postgresql://...
+JWT_SECRET=<strong-secret>
+CORS_ORIGINS=https://recruitment-application-iv1201-client.onrender.com,http://localhost:3001
+APP_BASE_URL=https://recruitment-application-iv1201-client.onrender.com
+MAILERSEND_API_KEY=ms_xxxxxxxxxxxxxxxxxxxxxxxxx
+MAIL_FROM=Recruitment App <no-reply@your-domain.com>
+```
+
+### Client
+
+Typical hosted client settings:
+
+- Root Directory: `client`
+- Build Command: `npm install && npm run build`
+- Publish Directory: `build`
+
+Typical production client environment:
+
+```env
+REACT_APP_API_BASE_URL=https://recruitment-application-iv1201.onrender.com/api/v1
 ```
 
 ---
 
-## CI / deployment automation (GitHub Actions)
+# Local development
 
-The repo includes workflows for:
+## Run both apps locally
 
-* CI (`.github/workflows/ci.yaml`)
+Use two terminals.
 
-  * client tests/build
-  * server lint/tests
-* CodeQL
-* Render deploy hooks (`.github/workflows/deploy.yml`)
+### Terminal 1: server
 
-### Required GitHub secrets for deploy workflow
+```bash
+cd server
+npm install
+npm run dev
+```
 
-Set these in GitHub repo settings:
+### Terminal 2: client
 
-* `RENDER_DEPLOY_HOOK` (server deploy hook URL)
-* `RENDER_CLIENT_DEPLOY_HOOK` (client deploy hook URL)
+```bash
+cd client
+npm install
+npm start
+```
+
+Expected local URLs:
+
+- client: `http://localhost:3001`
+- server: `http://localhost:3000`
+- API base: `http://localhost:3000/api/v1`
 
 ---
 
-## Troubleshooting
+# Troubleshooting
 
-### `psql` command not found
+## `psql` command not found
 
-Install PostgreSQL client tools and ensure `psql` is on your PATH.
+Install PostgreSQL client tools and make sure `psql` is on your `PATH`.
 
-### CORS errors in browser
+## Browser CORS errors
 
-Check `CORS_ORIGINS` on the server. It must include your client URL exactly.
+Check the server `CORS_ORIGINS` value. It must include the exact client origin, for example:
 
-### Password recovery emails not sending
+```env
+CORS_ORIGINS=http://localhost:3001
+```
 
-Verify:
+## Client is calling the deployed API instead of local API
 
-* `MAILERSEND_API_KEY` is set and valid
-* `MAIL_FROM` uses a MailerSend-verified domain/sender
-* `APP_BASE_URL` points to the frontend URL (so links are correct)
-* your MailerSend account/domain is allowed to send from the configured sender
+Set this in `client/.env`:
 
-### Server boots but `/health` returns degraded
+```env
+REACT_APP_API_BASE_URL=http://localhost:3000/api/v1
+```
 
-Database connection is failing. Re-check:
+Then restart the client dev server.
 
-* `DATABASE_URL` (Neon) or `DB_*` (local)
-* SSL requirement for hosted DBs
-* firewall/network access
+## Password recovery emails are not sending
+
+Check:
+
+- `MAILERSEND_API_KEY`
+- `MAIL_FROM`
+- `APP_BASE_URL`
+- that your MailerSend sender/domain is verified
+
+## Recovery link opens the wrong frontend URL
+
+Check:
+
+- `APP_BASE_URL` on the server
+
+For local development it should usually be:
+
+```env
+APP_BASE_URL=http://localhost:3001
+```
+
+## Health endpoint returns degraded
+
+The API is up, but the database connection failed.
+
+Check:
+
+- `DATABASE_URL` or `DB_*`
+- database availability
+- SSL requirements for hosted databases
+- firewall or network access
