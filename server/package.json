@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --passWithNoTests",
+    "test:ci": "jest --runInBand --passWithNoTests",
+    "test:coverage": "jest --coverage --runInBand --passWithNoTests",
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "db:init": "node scripts/db-init.js",

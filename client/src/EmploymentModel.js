@@ -16,7 +16,7 @@ const model = {
     recruiter: 0,
     wantedPage: "#/",
     applications: [],
-    application: null,
+    selectedApplication: null,
     token: null,
     readym: true,
     status: null,
@@ -94,7 +94,7 @@ const model = {
     async get1Application(id)
     {
       this.readym=false;
-      this.application=await getApplication(id);
+      this.selectedApplication=await getApplication(id);
       console.log(await getApplication(id));
       this.readym=true;
     },
@@ -113,7 +113,7 @@ const model = {
     * years of experience with roller coasters as yearsRoller {number}
     * @returns nothing it sends the application to database
     */
-    async application(fromDate, toDate, yearsTicket, yearsLotteries, yearsRoller) {
+    async submitApplicationForm(fromDate, toDate, yearsTicket, yearsLotteries, yearsRoller) {
         
         const competences = [
           { competenceId: 1, yearsOfExperience: yearsTicket },
@@ -171,7 +171,7 @@ const model = {
     async changeStatus(status)
     {
       try{
-      this.mes=await editAppStatus(this.application.applicationId,status,this.application.version);
+      this.mes=await editAppStatus(this.selectedApplication.applicationId,status,this.selectedApplication.version);
       console.log(JSON.stringify(this.mes));
       }
       catch (err){
