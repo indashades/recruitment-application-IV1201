@@ -28,6 +28,10 @@ jobs:
         run: npm install
         working-directory: client
 
+      - name: Test client
+        run: npm test
+        working-directory: client
+
       # --- Deploy server ---
       - name: Trigger Render deploy
         run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
