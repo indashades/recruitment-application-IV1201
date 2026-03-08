@@ -90,10 +90,10 @@ describe("basic views", () => {
 
     render(<ApplyView {...props} />);
 
-    fireEvent.change(screen.getByPlaceholderText(/avalable from/i), {
+    fireEvent.change(screen.getByPlaceholderText(/available from/i), {
       target: { value: "2026-05-01" },
     });
-    fireEvent.change(screen.getByPlaceholderText(/avalable to/i), {
+    fireEvent.change(screen.getByPlaceholderText(/available to/i), {
       target: { value: "2026-05-20" },
     });
     fireEvent.change(screen.getByPlaceholderText(/ticket sales/i), {

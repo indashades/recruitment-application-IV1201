@@ -11,7 +11,7 @@ i18n.use(initReactI18next).init({
             translation: {
                 rl: "Register/Login",
                 va: "view applicants",
-                appl: "apply for job",
+                appl: "apply for the job",
                 log: "log in",
                 reg: "register",
                 rec: "recover account",
@@ -42,7 +42,7 @@ i18n.use(initReactI18next).init({
                 li1: "We send a secure link to the email address connected to the account.",
                 li2: "For privacy, the same success message is shown whether or not the account exists.",
                 li3: "If you don't see the email, check your spam/junk folder.",
-                li4: "back to login",
+                li4: "back to sign in",
                 wat: "what happens next?",
                 car3: "Enter at least 3 characters",
                 secrec: "secure recovery link",
