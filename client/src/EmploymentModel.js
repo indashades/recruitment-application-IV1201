@@ -175,27 +175,26 @@ const model = {
     * @param status {string} contains either "unhandled", "accepted" or "rejected"
     * @return returns nothing but changes the status in database 
     */
-    async changeStatus(status)
-    {
-      try{
-      this.mes=await editAppStatus(this.selectedApplication.applicationId,status,this.selectedApplication.version);
-      console.log(JSON.stringify(this.mes));
-      return 0;
-      }
-      catch (err){
-        
+    async changeStatus(status) {
+      try {
+        this.mes = await editAppStatus(
+          this.selectedApplication.applicationId,
+          status,
+          this.selectedApplication.version
+        );
+        console.log(JSON.stringify(this.mes));
+        return 0;
+      } catch (err) {
+        console.log("ERROR FROM BACKEND:", err);
+        this.mes = err;
 
-          console.log("ERROR FROM BACKEND:", err);
-      
-          if (err.error?.code === "CONFLICT") {
-            return 1;
-          } else {
-            return 2;
-          }
-          this.mes=err;
+        if (err.error?.code === "CONFLICT") {
+          window.alert("Another user updated this application. Please refresh.");
+          return 1;
+        } else {
+          return 2;
         }
-        
-      
+      }
     },
     /*
     * @param mail or username {string}
