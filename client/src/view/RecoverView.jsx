@@ -1,23 +1,6 @@
-<<<<<<< Updated upstream
-/**
- * View component for step 1 of account recovery (request recovery link).
- *
- * @param {{
- *   onChange: () => void,
- *   doUsername: (event: import("react").ChangeEvent<HTMLInputElement>) => void,
- *   usernameV?: string,
- *   loading?: boolean,
- *   errorMessage?: string,
- *   successMessage?: string,
- *   onBack: () => void
- * }} props
- * @returns {JSX.Element}
- */
-
-=======
 import "../i18n";
 import { useTranslation } from "react-i18next"; 
->>>>>>> Stashed changes
+
 export function RecoverView(props) {
   const { t, i18n } = useTranslation();
     
@@ -71,7 +54,7 @@ export function RecoverView(props) {
             </form>
 
             <div className="auth-info">
-              <p className="auth-kicker"><strong>What happens next?</strong></p>
+              <p className="auth-kicker"><strong>{t("wat")}</strong></p>
               <ul>
                 <li>{t("li1")}</li>
                 <li>{t("li2")}</li>
