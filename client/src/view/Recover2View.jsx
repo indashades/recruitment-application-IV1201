@@ -1,24 +1,5 @@
-<<<<<<< Updated upstream
-/**
- * View component for step 2 of account recovery (set new password from a recovery link).
- *
- * @param {{
- *   onChange: () => void,
- *   doPW: (event: import("react").ChangeEvent<HTMLInputElement>) => void,
- *   passwordV?: string,
- *   hasToken: boolean,
- *   loading?: boolean,
- *   errorMessage?: string,
- *   successMessage?: string,
- *   onBack: () => void,
- *   onRequestNewLink: () => void
- * }} props
- * @returns {JSX.Element}
- */
-=======
 import "../i18n";
 import { useTranslation } from "react-i18next"; 
->>>>>>> Stashed changes
 export function Recover2View(props) {
   const { t, i18n } = useTranslation();
     
@@ -105,7 +86,7 @@ export function Recover2View(props) {
                     </button>
                   ) : (
                     <button type="button" className="auth-button auth-button--secondary" onClick={props.onRequestNewLink}>
-                      Request a new link
+                      {t("recnel")}
                     </button>
                   )}
                 </div>
