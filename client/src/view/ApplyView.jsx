@@ -9,7 +9,7 @@ export function ApplyView(props) {
 
     
     return (
-        <div class="centered-container">
+        <div className="centered-container">
     <div>
     <h1>{t("applyf")}</h1>
     </div>

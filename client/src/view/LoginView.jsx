@@ -8,7 +8,7 @@ export function LoginView(props) {
     function log(){props.onChange();}
     
     return (
-        <div class="centered-container">
+        <div className="centered-container">
     <div>
     <h1>{t("log")}</h1>
     </div>

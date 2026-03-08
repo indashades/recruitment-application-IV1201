@@ -8,7 +8,7 @@ export function StartView(props) {
     function appl(){props.apply();}
     
     return (
-        <div class="centered-container">
+        <div className="centered-container">
     <div>
     <h1>{t("welcome")}</h1>
     </div>
