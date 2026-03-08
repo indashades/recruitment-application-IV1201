@@ -1,7 +1,10 @@
 import { getApplications, login, register, submitApplication, getApplication, editAppStatus, sendRec1, sendRec2 } from "./asyncThings";
 import { makeAutoObservable } from "mobx";
+import "./i18n";
+import { useTranslation } from "react-i18next"; 
 
 const model = {  
+  
     
     //variables
     person_id: null,
@@ -160,8 +163,12 @@ const model = {
         
         this.loggedin=1;
         console.log("registrered and logged in as "+this.username);
+        return 0;
           }
-          catch{alert("registration failed");}//temp ska flyttas men då jag inte kan testa saker så gör jag den här snabbt
+          catch{
+            
+            return 1;
+          }
 
     },
     /*
@@ -173,6 +180,7 @@ const model = {
       try{
       this.mes=await editAppStatus(this.selectedApplication.applicationId,status,this.selectedApplication.version);
       console.log(JSON.stringify(this.mes));
+      return 0;
       }
       catch (err){
         
@@ -180,9 +188,9 @@ const model = {
           console.log("ERROR FROM BACKEND:", err);
       
           if (err.error?.code === "CONFLICT") {
-            alert("Another user updated this application. Please refresh.");
+            return 1;
           } else {
-            alert("Something went wrong.");
+            return 2;
           }
           this.mes=err;
         }
@@ -239,8 +247,9 @@ const model = {
 
         this.loggedin=1;
         console.log("logged in as "+this.username);
+        return 0;
         }
-        catch{alert("login failed");}
+        catch{return 1;}
     }
     
  

@@ -2,6 +2,8 @@ import { Recover2View } from "../view/Recover2View";
 import { observer } from "mobx-react-lite";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import "../i18n";
+import { useTranslation } from "react-i18next"; 
 
 /**
  * Presenter component for step 2 of account recovery.
@@ -16,6 +18,7 @@ const Recover2 = observer(
     
 
     function Recover2Render(model){
+        const { t, i18n } = useTranslation();
         const [searchParams] = useSearchParams();
         const recoveryToken = searchParams.get("token") || "";
 
@@ -47,11 +50,11 @@ const Recover2 = observer(
 
         async function changeRegOrLog() {
             if(!recoveryToken){
-                setErrorMessage("This recovery link is missing a token. Please request a new recovery email.");
+                setErrorMessage(t("w1"));
                 setSuccessMessage("");
             }
             else if (!pw || pw.length<8){
-                setErrorMessage("Password must be at least 8 characters.");
+                setErrorMessage(t("w2"));
                 setSuccessMessage("");
             } else{
                 try{
@@ -60,11 +63,11 @@ const Recover2 = observer(
                 await model.model.rec2(recoveryToken,pw)
                 
                 window.location.hash = "#/";
-                setSuccessMessage("Password updated successfully. You can now continue to the application.");
+                setSuccessMessage(t("w3"));
                 }
                 catch{
                     setSuccessMessage("");
-                    setErrorMessage("This recovery link is invalid or expired. Please request a new recovery email.");
+                    setErrorMessage(t("w4"));
                 }
                 finally{
                     setLoading(false);

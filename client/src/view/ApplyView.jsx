@@ -1,18 +1,23 @@
+
+import "../i18n";
+import { useTranslation } from "react-i18next"; 
 export function ApplyView(props) {
+  const { t, i18n } = useTranslation();
     
     function log(){props.onChange();}
     function can(){props.onChange2();}
+
     
     return (
-        <div>
+        <div class="centered-container">
     <div>
-    <h1>Apply for job</h1>
+    <h1>{t("applyf")}</h1>
     </div>
     <div><input 
 
 type="text"
 value={props.avalablefrom}
-placeholder="Avalable from"
+placeholder={t("avfrom")}
 onChange={props.doPW}
 
 />
@@ -20,39 +25,39 @@ onChange={props.doPW}
 
 type="text"
 value={props.avalableto}
-placeholder="Avalable to"
+placeholder={t("avto")}
 onChange={props.doUsername}
 
 /></div>
 
 
 <div className="wider">
-  <h4>experience written as years in ticket sales</h4>
+  <h4>{t("exp1")}</h4>
 <input 
 type="text"
 value={props.yearsTicket}
-placeholder="experience written as years in ticket sales"
+placeholder={t("exp1")}
 onChange={props.appl1}
 /></div>
 <div className="wider">
-  <h4>experience written as years in lotteries work</h4>
+  <h4>{t("exp3")}</h4>
 <input 
 type="text"
 value={props.yearsLotteries}
-placeholder="experience written as years in lotteries work"
+placeholder={t("exp4")}
 onChange={props.appl2}
 /></div>
 <div className="wider">
-  <h4>experience written as years in roller coaster operation</h4>
+  <h4>{t("exp5")}</h4>
 <input 
 type="text"
 value={props.yearsRoller}
-placeholder="experience written as years in roller coaster operation"
+placeholder={t("exp5")}
 onChange={props.appl3}
 /></div>
 <div>
-<button onClick={can}>cancel</button>
-<button onClick={log}>submit</button>
+<button onClick={can}>{t("cancel")}</button>
+<button onClick={log}>{t("submit")}</button>
 </div>
     </div>
     );

@@ -13,8 +13,12 @@ import { observer } from "mobx-react-lite";
 import { Detailed } from "./detailedPresenter";
 import { Recover } from "./recoverPresenter";
 import { Recover2 } from "./recover2Presenter";
+import { useEffect } from "react";
+import i18n from "../i18n";
+
 
 function makeRouter() {
+  
   return createHashRouter([
     {
       path: "/",
@@ -65,6 +69,7 @@ const ReactRoot = observer(   //  will be added in week 3
     
     
   function ReactRoot(){
+    useEffect(()=>{i18n.changeLanguage(navigator.language)})
       
       if(!model.readym){ return (<div><h1>loading...</h1></div>)}//theFunction searchroot
           else{/**/ 
