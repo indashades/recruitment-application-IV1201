@@ -12,12 +12,8 @@
     "mobx-react-lite": "4.1.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-router-dom": "6.22.3",
-<<<<<<< HEAD
-=======
+    "react-router-dom": "^6.22.3",
     "react-i18next": "^13.5.0",
-    "react-router-dom": "7.13.0",
->>>>>>> f32a96c238eaee274901dc7f1f4870bf20e22b91
     "react-scripts": "5.0.1",
     "web-vitals": "2.1.4"
   },
