@@ -8,7 +8,7 @@ export function RegorlogView(props) {
     function rec(){props.rec1();}
     
     return (
-        <div class="centered-container">
+        <div className="centered-container">
     <div>
     <h1>{t("rl")}</h1>
     </div>

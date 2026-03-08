@@ -1,7 +1,5 @@
 import { getApplications, login, register, submitApplication, getApplication, editAppStatus, sendRec1, sendRec2 } from "./asyncThings";
 import { makeAutoObservable } from "mobx";
-import "./i18n";
-import { useTranslation } from "react-i18next"; 
 
 const model = {  
   

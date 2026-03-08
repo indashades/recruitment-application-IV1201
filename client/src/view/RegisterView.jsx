@@ -11,7 +11,7 @@ export function RegisterView(props) {
     
     
     return (
-        <div class="centered-container">
+        <div className="centered-container">
     <div>
     <h1>{t("reg")}</h1>
     </div>
