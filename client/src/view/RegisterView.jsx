@@ -1,4 +1,7 @@
+import "../i18n";
+import { useTranslation } from "react-i18next"; 
 export function RegisterView(props) {
+    const { t, i18n } = useTranslation();
     
     function regg()
     {
@@ -8,15 +11,15 @@ export function RegisterView(props) {
     
     
     return (
-        <div>
+        <div className="centered-container">
     <div>
-    <h1>register</h1>
+    <h1>{t("reg")}</h1>
     </div>
     <div><input 
 
 type="text"
 value={props.username}
-placeholder="username"
+placeholder={t("username")}
 onChange={props.usernamea}
 
 />
@@ -24,7 +27,7 @@ onChange={props.usernamea}
 
 type="password"
 value={props.pw}
-placeholder="Password"
+placeholder={t("Password")}
 onChange={props.pwa}
 
 /></div>
@@ -32,7 +35,7 @@ onChange={props.pwa}
 
 type="text"
 value={props.mail}
-placeholder="E-mail address"
+placeholder={t("mail")}
 onChange={props.maila}
 
 />
@@ -40,7 +43,7 @@ onChange={props.maila}
 
 type="text"
 value={props.name1}
-placeholder="first name"
+placeholder={t("fn")}
 onChange={props.name1a}
 
 />
@@ -48,7 +51,7 @@ onChange={props.name1a}
 
 type="text"
 value={props.name2}
-placeholder="last name"
+placeholder={t("ln")}
 onChange={props.name2a}
 
 /></div>
@@ -57,12 +60,12 @@ onChange={props.name2a}
 
 type="text"
 value={props.pnr}
-placeholder="person number"
+placeholder={t("pnr")}
 onChange={props.pnra}
 
 />
 </div>
-<button onClick={regg}>submit</button>
+<button onClick={regg}>{t("submit")}</button>
     </div>
     );
   }

@@ -1,20 +1,7 @@
-/**
- * View component for step 2 of account recovery (set new password from a recovery link).
- *
- * @param {{
- *   onChange: () => void,
- *   doPW: (event: import("react").ChangeEvent<HTMLInputElement>) => void,
- *   passwordV?: string,
- *   hasToken: boolean,
- *   loading?: boolean,
- *   errorMessage?: string,
- *   successMessage?: string,
- *   onBack: () => void,
- *   onRequestNewLink: () => void
- * }} props
- * @returns {JSX.Element}
- */
+import "../i18n";
+import { useTranslation } from "react-i18next"; 
 export function Recover2View(props) {
+  const { t, i18n } = useTranslation();
     
     function log(e){
       if (e) e.preventDefault();
@@ -25,11 +12,10 @@ export function Recover2View(props) {
       <div className="auth-shell recovery-shell">
         <div className="auth-card recovery-card">
           <div className="auth-card__header">
-            <span className="auth-badge">Secure recovery link</span>
-            <h1>Set a new password</h1>
+            <span className="auth-badge">{t("secrec")}</span>
+            <h1>{t("newpw")}</h1>
             <p>
-              This page reads your recovery token automatically from the link in your email.
-              You only need to choose a new password.
+              {t("rectok")}
             </p>
           </div>
 
@@ -37,14 +23,14 @@ export function Recover2View(props) {
             {!props.hasToken ? (
               <>
                 <div className="auth-alert auth-alert--error" role="alert">
-                  This recovery link is incomplete or invalid. Please request a new recovery email.
+                  {t("invtok")}
                 </div>
                 <div className="auth-actions">
                   <button type="button" className="auth-button" onClick={props.onRequestNewLink}>
-                    Request new recovery link
+                    {t("recnew")}
                   </button>
                   <button type="button" className="auth-button auth-button--secondary" onClick={props.onBack}>
-                    Back to start
+                    {t("bts")}
                   </button>
                 </div>
               </>
@@ -64,30 +50,30 @@ export function Recover2View(props) {
 
                 <form className="auth-form" onSubmit={log}>
                   <label className="auth-label" htmlFor="recovery-password">
-                    New password
+                    {t("newpw2")}
                   </label>
                   <input
                     id="recovery-password"
                     className="auth-input"
                     type="password"
                     value={props.passwordV || ""}
-                    placeholder="At least 8 characters"
+                    placeholder={t("nu")}
                     onChange={props.doPW}
                     autoComplete="new-password"
                     disabled={props.loading}
                   />
 
                   <button className="auth-button" type="submit" disabled={props.loading}>
-                    {props.loading ? "Saving..." : "Save new password"}
+                    {props.loading ? t("save") : t("pas")}
                   </button>
                 </form>
 
                 <div className="auth-info">
-                  <p className="auth-kicker"><strong>Password tips</strong></p>
+                  <p className="auth-kicker"><strong>{t("ptip")}</strong></p>
                   <ul>
-                    <li>Use at least 8 characters (longer is better).</li>
-                    <li>Avoid reusing old passwords.</li>
-                    <li>Use a password manager if possible.</li>
+                    <li>{t("liv1")}</li>
+                    <li>{t("liv2")}</li>
+                    <li>{t("liv3")}</li>
                   </ul>
                 </div>
 
@@ -96,11 +82,11 @@ export function Recover2View(props) {
                 <div className="auth-actions">
                   {props.successMessage ? (
                     <button type="button" className="auth-button" onClick={props.onBack}>
-                      Continue to app
+                      {t("contoap")}
                     </button>
                   ) : (
                     <button type="button" className="auth-button auth-button--secondary" onClick={props.onRequestNewLink}>
-                      Request a new link
+                      {t("recnel")}
                     </button>
                   )}
                 </div>

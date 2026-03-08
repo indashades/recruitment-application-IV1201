@@ -1,11 +1,14 @@
 import { RegisterView } from "../view/RegisterView";
 import { observer } from "mobx-react-lite";
+import "../i18n";
+import { useTranslation } from "react-i18next"; 
 
 const Register = observer(            
     
     //Registering med: first name as name1 {string}, last name as name2 {string}, person number as pnr {string} and email address as mail {string}
 
     function RegisterRender(model){
+        const { t, i18n } = useTranslation();
         
         let pw=null;
         let username=null;
@@ -21,29 +24,30 @@ const Register = observer(
         function maila(p){mail=p.target.value;}
         async function changeRegOrLog() {
             
-                if(pw==null){alert("missing password");}
-                else if(username==null){alert("missing username");}
-                else if(pnr==null){alert("missing person number");}
-                else if(name1==null){alert("missing first name");}
-                else if(name2==null){alert("missing last name");}
-                else if(mail==null){alert("missing mail address");}
-                else if (!(mail.includes(".") && mail.includes("@"))){alert("invalid mail address");}
-                else if (username.length<3){alert("username must be at least 3 letters");}
-                else if (pw.length<8){alert("password must be at least 8 letters");}
-                else if (pw.length>99 || username.length>99||name1>99||name2>99||mail>99){alert("strings are too long")}
+                if(pw==null){alert(t("pwmis"));}
+                else if(username==null){alert(t("miss3"));}
+                else if(pnr==null){alert(t("fere"));}
+                else if(name1==null){alert(t("miss2"));}
+                else if(name2==null){alert(t("miss"));}
+                else if(mail==null){alert(t("misas"));}
+                else if (!(mail.includes(".") && mail.includes("@"))){alert(t("invm"));}
+                else if (username.length<3){alert(t("usern3"));}
+                else if (pw.length<8){alert(t("morest"));}
+                else if (pw.length>99 || username.length>99||name1>99||name2>99||mail>99){alert(t("imposs"))}
                 else if (!(pnr.length==12||pnr.length==10||(pnr.length==11 && pnr.includes("-")==6)||(pnr.length==13&&pnr.includes("-")==8)))
-                    {alert("invalid personnumber");}
+                    {alert(t("inp"));}
                 
 
 
                 else
                 {
-                    await model.model.registrering(pnr,name1,name2,mail,pw,username);
+                    if (await model.model.registrering(pnr,name1,name2,mail,pw,username)==1)
+                    {alert(t("transfail"));}//temp ska flyttas men då jag inte kan testa saker så gör jag den här snabbt}
                     await model.model.loggaIn(username,pw);
                 }
                 if (model.model.loggedin===1)
                 {
-                    alert("log in successful");
+                    alert(t("successlog"));
                     window.location.hash = model.model.wantedPage;
                 }
                 
@@ -58,6 +62,7 @@ const Register = observer(
         
     }
 );
+
 
 export { Register };
     

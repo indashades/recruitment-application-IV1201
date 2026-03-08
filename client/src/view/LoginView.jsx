@@ -1,17 +1,22 @@
+
+import "../i18n";
+import { useTranslation } from "react-i18next"; 
 export function LoginView(props) {
+    const { t, i18n } = useTranslation();
+
     
     function log(){props.onChange();}
     
     return (
-        <div>
+        <div className="centered-container">
     <div>
-    <h1>login</h1>
+    <h1>{t("log")}</h1>
     </div>
     <div><input 
 
 type="text"
 value={props.usernameV}
-placeholder="username"
+placeholder={t("username")}
 onChange={props.doUsername}
 
 />
@@ -19,11 +24,11 @@ onChange={props.doUsername}
 
 type="password"
 value={props.passwordV}
-placeholder="Password"
+placeholder={t("password")}
 onChange={props.doPW}
 
 /></div>
-<button onClick={log}>submit</button>
+<button onClick={log}>{t("submit")}</button>
     </div>
     );
   }

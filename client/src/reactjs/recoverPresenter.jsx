@@ -1,6 +1,8 @@
 import { RecoverView } from "../view/RecoverView";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
+import "../i18n";
+import { useTranslation } from "react-i18next"; 
 
 /**
  * Presenter component for step 1 of account recovery.
@@ -13,8 +15,11 @@ import { useState } from "react";
 const Recover = observer(            
     // Step 1: request a password recovery link using username or email
     
+    
+    
 
     function RecoverRender(model){
+        const { t, i18n } = useTranslation();
         const [username, setUsername] = useState("");
         const [loading, setLoading] = useState(false);
         const [errorMessage, setErrorMessage] = useState("");
@@ -31,7 +36,7 @@ const Recover = observer(
         async function changeRegOrLog() {
             const identifier = (username || "").trim();
             if(identifier.length < 3){
-                setErrorMessage("Enter at least 3 characters (username or email).");
+                setErrorMessage(t("waaa"));
                 setSuccessMessage("");
             }
             else{
@@ -39,11 +44,11 @@ const Recover = observer(
                     setLoading(true);
                     setErrorMessage("");
                     await model.model.rec1(identifier);
-                    setSuccessMessage("If the account exists, a recovery email has been sent. Please check your inbox and spam folder.");
+                    setSuccessMessage(t("waa"));
                 }
                 catch{
                     setSuccessMessage("");
-                    setErrorMessage("We couldn't send the recovery email right now. Please try again.");
+                    setErrorMessage(t("wa"));
                 }
                 finally{
                     setLoading(false);

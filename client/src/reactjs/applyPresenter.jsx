@@ -1,5 +1,7 @@
 import { ApplyView } from "../view/ApplyView";
 import { observer } from "mobx-react-lite";
+import "../i18n";
+import { useTranslation } from "react-i18next"; 
 
 const Apply = observer(            
     /*apply for job with availability as avalablefrom {string} and avalableto {string} 
@@ -8,6 +10,7 @@ const Apply = observer(
     
 
     function ApplyRender(model){
+        const { t, i18n } = useTranslation();
         let avalablefrom=null;
         let avalableto=null;
         let yearsTicket=null;
