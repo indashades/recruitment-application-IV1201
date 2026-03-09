@@ -1,12 +1,22 @@
 const { getRecoveryTokenTtlMinutes } = require("../utils/recoveryToken");
 
-// MailerSend Email API (REST)
-// Docs: POST /v1/email -> 202 Accepted + X-Message-Id header
-
+/**
+ * Safely converts a value to a trimmed string.
+ * @param {*} v
+ * @returns {string}
+ */
 function sanitize(v) {
   return String(v || "").trim();
 }
 
+/**
+ * Parses a boolean-like environment variable.
+ * Accepts: 1, true, yes, on (case-insensitive).
+ *
+ * @param {*} value
+ * @param {boolean} [fallback=false]
+ * @returns {boolean}
+ */
 function parseBoolean(value, fallback = false) {
   if (value === undefined || value === null || value === "") return fallback;
   return ["1", "true", "yes", "on"].includes(String(value).toLowerCase());
@@ -91,6 +101,15 @@ function getFetch() {
   );
 }
 
+/**
+ * Sends a JSON POST request with timeout handling.
+ *
+ * @param {string} url
+ * @param {object} body
+ * @param {Record<string,string>} headers
+ * @param {number} timeoutMs
+ * @returns {Promise<{res: Response, text: string, json: any}>}
+ */
 async function postJson(url, body, headers, timeoutMs) {
   const f = getFetch();
 
@@ -156,10 +175,12 @@ function summarizeMailerSendError(json, text) {
 }
 
 /**
- * Sends account recovery email (set-password / reset-password) via MailerSend.
+ * Input for sending a recovery email.
  *
- * @param {{to:string, recoveryLink:string, mode:"set_password"|"reset_password"}} input
- * @returns {Promise<void>}
+ * @typedef {Object} RecoveryEmailInput
+ * @property {string} to - Recipient email address.
+ * @property {string} recoveryLink - Full URL that the user should open to complete recovery.
+ * @property {"set_password"|"reset_password"} mode - Email type.
  */
 async function sendRecoveryEmail({ to, recoveryLink, mode }) {
   const cfg = readMailerSendConfig();
