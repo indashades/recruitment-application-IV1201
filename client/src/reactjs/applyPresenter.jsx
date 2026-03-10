@@ -25,7 +25,7 @@ const Apply = observer(
                 
                 if (model.model.loggedin===1)
                     {
-                        if(avalablefrom==null || avalableto || yearsLotteries || yearsRoller || yearsTicket){alert("you are missing a field");}
+                        if(avalablefrom==null || avalableto==null || yearsLotteries==null || yearsRoller==null || yearsTicket==null){alert("you are missing a field");}
                         else if(yearsLotteries>8 || yearsRoller>8 || yearsTicket>8){alert("you cant have more than 8 years of experience");}
                         
                         else{
