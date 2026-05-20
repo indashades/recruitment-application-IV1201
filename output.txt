@@ -1,0 +1,28 @@
+
+if "!whaleBlubberProcessing" in msg.content:
+                with open("countries.json", "r") as f:
+                    countries = json.load(f)
+                for  nam in countries:
+                    if msg.author.display_name==nam["name"] and nam["t16"]==0 and any(role.name == "Distant North" for role in msg.author.roles):
+                        if nam["food"]>=10000 and nam["money"]>=20000 and nam["lux"]>=0 and nam["timber"]>= and nam["stone"]>=5000 and nam["nobleMetals"]>=0 and nam["strategicMetals"]>=0:
+                            nam["food"]=nam["food"]-10000
+                            nam["money"]=nam["money"]-20000
+                            nam["lux"]=nam["lux"]-0
+                            nam["timber"]=nam["timber"]-5000
+                            nam["stone"]=nam["stone"]-0
+                            nam["nobleMetals"]=nam["nobleMetals"]-0
+                            nam["strategicMetals"]=nam["strategicMetals"]-0
+                            nam["food+"]=nam["food+"]+0
+                            nam["gra+"]=nam["gra+"]+0
+                            nam["lux+"]=nam["lux+"]+500
+                            nam["timber+"]=nam["timber+"]+0
+                            nam["stone+"]=nam["stone+"]+0
+                            nam["nobleMetals+"]=nam["nobleMetals+"]+0
+                            nam["strategicMetals+"]=nam["strategicMetals+"]+0
+                            nam["t16"]=16
+                            await msg.channel.send("crop rotation researched!")
+                            with open("countries.json", "w") as f:
+                                json.dump(countries, f, indent=4)
+                        else:
+                            await msg.channel.send("you cannot afford that!")
+

@@ -1,0 +1,8 @@
+{
+    "from": "Dutchy of Novo-Gorod",
+    "to": "Empire of Estonia",
+    "send_item": "lux",
+    "send_amount": 300.0,
+    "receive_item": "food",
+    "receive_amount": 500.0
+}
